@@ -31,15 +31,15 @@
   constructor(props){
       super(props);
       this.state = {
-          upperText: "Placeholder",
-          lowerText: "Text."
+          username: "",
+          password: ""
       }
   }
 
   fetchData = () => {
-      fetch('https://stormy-coast-58891.herokuapp.com/login?username=10gdavies&password=password')
+      fetch(`https://stormy-coast-58891.herokuapp.com/login?username=${this.state.username}&password=${this.state.password}`)
       .then(response => response.json())
-      .then(response => {if(response.length == 0){console.log("User not found")} else if(response.length == 1){console.log("User found" + response)}else {console.log("There are too many users associated with that account!")}})
+      .then(response => console.log(response))
       .catch(err => console.error(err))
   }
   
@@ -60,7 +60,7 @@
                   <div className="item-inner">
                     <div className="item-title item-label">Username</div>
                     <div className="item-input-wrap">
-                      <input type="text" name="username" placeholder="Your username" />
+                      <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
                     </div>
                   </div>
                 </li>
@@ -68,7 +68,7 @@
                   <div className="item-inner">
                     <div className="item-title item-label">Password</div>
                     <div className="item-input-wrap">
-                      <input type="password" name="password" placeholder="Your password" />
+                      <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
                     </div>
                   </div>
                 </li>
