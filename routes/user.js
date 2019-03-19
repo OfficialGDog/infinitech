@@ -66,9 +66,9 @@ router.get("/user/:id", (req, res) => {
 const pool = mysql.createPool({
     connectionLimit: 10,
     host: 'us-cdbr-iron-east-03.cleardb.net',
-    user: 'b8b0d42b181867',
-    password: '5e715100',
-    database: 'heroku_86cd1dc8c99fff0'
+    user: 'b64fbcbeb81ae0',
+    password: '903dcf50',
+    database: 'heroku_ebed775274bf25d'
 })
 
 function getConnection(){

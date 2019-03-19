@@ -35,17 +35,12 @@
           lowerText: "Text."
       }
   }
-  
-  createMeme = () => {
-      var container = document.getElementById('container');
-      var div = document.getElementById('preview'),
-      clone = div.cloneNode(true); // true means clone all childNodes and all event handlers
-      clone.id = "background";
-      clone.style.width = "100%";
-      clone.style.height = "95vh";
-      clone.style.backgroundSize = "auto";
-      clone.style.fontSize = "2em";
-      container.parentNode.replaceChild(clone,container);
+
+  fetchData = () => {
+      fetch('https://stormy-coast-58891.herokuapp.com/users')
+      .then(response => response.json())
+      .then(response => console.log(response))
+      .catch(err => console.error(err))
   }
   
   render(){
@@ -81,7 +76,7 @@
             </div>
             <div className="list">
               <ul>
-                <li><a className="item-link list-button" href="#">Sign In</a></li>
+                <li><a className="item-link list-button" onClick={this.fetchData}>Sign In</a></li>
               </ul>
             </div>
           </form>
