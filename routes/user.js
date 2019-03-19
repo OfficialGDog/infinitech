@@ -15,16 +15,15 @@ router.get("/users", (req, res) => {
 })
 
 router.get('/login', (req, res) => {
-    const username = '10gdavies';
-    const password = 'password';
     console.log("Logging in with user credientials....")
     console.log(req.body);
-    const queryString = "SELECT * FROM User WHERE (User_Username = ?) and (User_Password = ?)"
-    getConnection().query(queryString, [username, password], (err, rows, fields) => {
+    const queryString = "SELECT * FROM User WHERE (User_Username = '10gdavies') and (User_Password = 'password')"
+    getConnection().query(queryString, (err, rows, fields) => {
         if(err) {
             console.log("Query Failed: " + err)
             return res.sendStatus(500);
         }
+        console.log("Query Successfull");
         return res.json(rows)
     })
     res.end()
