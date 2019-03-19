@@ -53,7 +53,6 @@
           .then(response => {if(response.length == 0) {app.dialog.alert("We couldn't find the user! 😭­", "User not found!");} else if(response.length == 1){this.setState({data : response[0]}); console.log("Logged in as: " + response[0].User_Username); console.log(response); app.views.main.router.navigate('/expenses/');} else {app.dialog.alert("Too many users are associated with that account! 🤔­", "Error: 4512");}})
           .catch(err => console.error(err))
       }
-      
       render(){
       return(
         <div>

@@ -120,8 +120,7 @@ input {
   margin: auto;
   z-index: 1;
   position: relative;
-  width: 90%;
-  height: 160px;
+  height: 135px;
   margin-bottom: 15px;
   -webkit-perspective: 2000px;
           perspective: 2000px;
@@ -190,7 +189,7 @@ input {
 .card__part__inner {
   overflow: hidden;
   position: relative;
-  height: 78%;
+  height: 75%;
   border-radius: inherit;
 }
 .card__text {
@@ -258,8 +257,9 @@ input {
 }
 .card__face__price {
   margin-top: -3px;
+  margin-bottom: 0px;
   font-weight: normal;
-  font-size: 22px;
+  font-size: 25px;
   color: #555A5F;
   transition: color 0.3s;
 }
