@@ -1,24 +1,29 @@
-const app = require('express');
-const morgan = require('morgan');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
+// load our app server using express somehow....
+const express = require('express')
+const app = express()
+const morgan = require('morgan')
+const mysql = require('mysql')
 
-app.use(bodyParser.urlencoded({extended: false}));
+const bodyParser = require('body-parser')
 
-app.use(express.static('./public'));
+app.use(bodyParser.urlencoded({extended: false}))
 
-app.use(morgan('short'));
 
-const router = require('./routes/user.js');
+app.use(express.static('./public'))
 
-app.use(router);
+app.use(morgan('short'))
 
-app.get("/", (req,res) => {
-	res.sendFile(path.join('./public' + '/index.html'));
-});
+const router = require('./routes/user.js')
+
+app.use(router)
+
+app.get("/", (req, res) => {
+  console.log("Responding to root route")
+  res.sendFile(path.join(__dirname +'/index.html'));
+})
 
 const PORT = process.env.PORT || 3003
-
+// localhost:PORT
 app.listen(PORT, () => {
-    console.log("Server is up and running on" + PORT)
-});
+  console.log("Server is up and listening on: " + PORT)
+})
