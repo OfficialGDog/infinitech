@@ -40,56 +40,65 @@
               data: null
           }
       }
+
+      componentDidMount() {
+         let pagecontent = document.getElementsByClassName("page-content login-screen-content")[0];
+         pagecontent.style = "background-image: url('assets/background2.png');background-position: center;background-repeat: no-repeat;background-size: cover; display: flex; justify-content: center; align-items: center;";
+      }
     
       fetchData = () => {
           fetch(`https://stormy-coast-58891.herokuapp.com/login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
-          .then(response => {if(response.length == 0) {console.log("User not found :(")} else if(response.length == 1){this.setState({data : response[0]}); console.log("Logged in as: " + response[0].User_Username); console.log(response)} else {console.log("Too many users are associated with that account!")}})
+          .then(response => {if(response.length == 0) {app.dialog.alert("We couldn't find the user! 😭­", "User not found!");} else if(response.length == 1){this.setState({data : response[0]}); console.log("Logged in as: " + response[0].User_Username); console.log(response)} else {app.dialog.alert("Too many users are associated with that account! 🤔­", "Error: 4512");}})
           .catch(err => console.error(err))
       }
       
       render(){
       return(
         <div>
-        <div class="login-screen-title">My App</div>
-          <form>
-            <div class="list">
+          <h1 class="logintitle">Saggezza</h1>
+            <form class="list">
               <ul>
-                <li class="item-content item-input">
-                  <div class="item-inner">
-                    <div class="item-title item-label">Username</div>
-                    <div class="item-input">
-                        <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
-                    </div>
-                  </div>
-                </li>
-                <li class="item-content item-input">
-                  <div class="item-inner">
-                    <div class="item-title item-label">Password</div>
-                    <div class="item-input">
-                        <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div className="list">
-              <ul>
-                <button type="button" onClick={this.fetchData}>Submit</button>
-                <a className="item-content item-link" href="/expenses/">Go to expenses</a>
-              </ul>
-            </div>
-          </form>
-          {this.state.data && (
-          <p style={{textAlign: "center"}}>Logged in as: {this.state.data.User_Username}</p>
-          )}
-          </div>              
+                <li class="">
+                  <div class="item-content item-input item-input-with-value">
+                    <div class="item-inner">
+                      <div class="item-title item-label">Username</div>
+                      <div class="item-input-wrap">
+                          <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
+                        </div>
+                        </div>
+                        </div>
+                        </li>
+                        <li>
+                          <div class="item-content item-input item-input-with-value">
+                            <div class="item-inner">
+                              <div class="item-title item-label">Password</div>
+                              <div class="item-input-wrap">
+                                  <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
+                                </div>
+                                </div>
+                                </div>
+                                </li>
+                                </ul>
+                                </form>
+                                <div class="list" style={{width: "90%"}}>
+                                  <ul>
+                                    <li>
+                                      <button type="button" class="list-button text-color-white bg-color-green" onClick={this.fetchData}>Login</button>
+                                      </li></ul><div style={{paddingTop: "25px", textAlign: "center"}}>
+                                        <div style={{display: "inline-block"}}>
+                                          <button class="loginBtn loginBtn--facebook">Login with Facebook</button>
+                                          </div>
+                                          <br />
+                                          <div style={{display: "inline-block"}}>
+                                            <button class="loginBtn loginBtn--google">Login with Google</button>
+                                          </div></div></div></div>
       );
       }
       }
       
       ReactDOM.render( 
-      <div>
+      <div style={{width: "85%", maxWidth: "600px"}}>
       <Meme />
       </div>,
       document.querySelector("#container") 
