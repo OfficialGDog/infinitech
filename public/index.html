@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content:">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#2196f3">
+  <!-- Your app title -->
+  <title>My App</title>
+  <!-- Path to Framework7 Library CSS -->
+  <link rel="stylesheet" href="../src/framework7.min.css">
+  <!-- Path to your custom app styles-->
+  <link rel="stylesheet" href="../app.css">
+</head>
+<body>
+    <div id="app">
+    <div class="view view-main">
+    <div id="container"></div>
+    </div>
+    </div>
+        <script type="text/javascript" src="../src/framework7.min.js"></script>
+        <script type="text/javascript" src="../src/initalise.js"></script>
+      <script type="text/babel">
+  
+  class Meme extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {
+          upperText: "Placeholder",
+          lowerText: "Text."
+      }
+  }
+  
+  createMeme = () => {
+      var container = document.getElementById('container');
+      var div = document.getElementById('preview'),
+      clone = div.cloneNode(true); // true means clone all childNodes and all event handlers
+      clone.id = "background";
+      clone.style.width = "100%";
+      clone.style.height = "95vh";
+      clone.style.backgroundSize = "auto";
+      clone.style.fontSize = "2em";
+      container.parentNode.replaceChild(clone,container);
+  }
+  
+  render(){
+  return(
+      <div data-name="home" className="page">
+        <div className="navbar">
+          <div className="navbar-inner">
+            <div className="title">Example Application</div>
+          </div>
+        </div>
+        <div className="page-content login-screen-content">
+          <div className="login-screen-title">Login Demo</div>
+          <form>
+            <div className="list">
+              <ul>
+                <li className="item-content item-input">
+                  <div className="item-inner">
+                    <div className="item-title item-label">Username</div>
+                    <div className="item-input-wrap">
+                      <input type="text" name="username" placeholder="Your username" />
+                    </div>
+                  </div>
+                </li>
+                <li className="item-content item-input">
+                  <div className="item-inner">
+                    <div className="item-title item-label">Password</div>
+                    <div className="item-input-wrap">
+                      <input type="password" name="password" placeholder="Your password" />
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="list">
+              <ul>
+                <li><a className="item-link list-button" href="#">Sign In</a></li>
+              </ul>
+            </div>
+          </form>
+        </div>
+      </div>
+                             
+  );
+  }
+  }
+  
+  ReactDOM.render( 
+  <div>
+  <Meme />
+  </div>,
+  document.querySelector("#container") 
+  );
+  </script>
+</body>
+​
+</html>
