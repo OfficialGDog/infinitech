@@ -12,10 +12,9 @@ router.get("/users", (req, res) => {
     connection.query(queryString, (err, rows, fields) => {
         if(err){
             console.log("Failed to query for users: " + err)
-            res.sendStatus(500)
-            return
+            return res.sendStatus(500)
         }
-        res.json(rows)
+        return res.json(rows)
     })
 })
 
@@ -28,8 +27,7 @@ router.post('/user_create', (req, res) => {
     getConnection().query(queryString, [firstName, lastName], (err, results, fields) => {
         if(err) {
             console.log("Failed to insert new user: " + err)
-            res.sendStatus(500);
-            return
+            return res.sendStatus(500);
         }
 
         console.log("Inserted a new user with id: ", results.insertId);
@@ -48,8 +46,7 @@ router.get("/user/:id", (req, res) => {
     connection.query(queryString, [userId], (err, rows, fields) => {
         if(err){
             console.log("Failed to query for users: " + err)
-            res.sendStatus(500)
-            return
+            return res.sendStatus(500)
         }
 
         console.log("I Think we fetched user succesffuly!")
@@ -58,7 +55,7 @@ router.get("/user/:id", (req, res) => {
             return {firstName: row.first_name, lastName: row.last_name}
         })
 
-        res.json(rows)
+        return res.json(rows)
     })
 
 })
