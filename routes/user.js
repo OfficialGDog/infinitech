@@ -1,10 +1,6 @@
 const express = require('express')
 const mysql = require('mysql')
 const router = express.Router()
-router.get('/messages', (req, res) => {
-    console.log("Show some messages or whatever...")
-    res.end()
-})
 
 router.get("/users", (req, res) => {
     const connection = getConnection()
@@ -18,20 +14,18 @@ router.get("/users", (req, res) => {
     })
 })
 
-router.post('/user_create', (req, res) => {
-    console.log("Trying to create a new user....")
-    const firstName = req.body.create_first_name
-    const lastName = req.body.create_last_name
-
-    const queryString = "INSERT INTO users (first_name, last_name) VALUES (?, ?)"
-    getConnection().query(queryString, [firstName, lastName], (err, results, fields) => {
+router.get('/login', (req, res) => {
+    const username = '10gdavies';
+    const password = 'password';
+    console.log("Logging in with user credientials....")
+    console.log(req.body);
+    const queryString = "SELECT * FROM User WHERE (User_Username = ?) and (User_Password = ?)"
+    getConnection().query(queryString, [username, password], (err, rows, fields) => {
         if(err) {
-            console.log("Failed to insert new user: " + err)
+            console.log("Query Failed: " + err)
             return res.sendStatus(500);
         }
-
-        console.log("Inserted a new user with id: ", results.insertId);
-        res.end()
+        return res.json(rows)
     })
     res.end()
 })

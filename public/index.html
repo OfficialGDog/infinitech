@@ -37,7 +37,7 @@
   }
 
   fetchData = () => {
-      fetch('https://stormy-coast-58891.herokuapp.com/users')
+      fetch('https://stormy-coast-58891.herokuapp.com/login')
       .then(response => response.json())
       .then(response => console.log(response))
       .catch(err => console.error(err))
@@ -76,7 +76,7 @@
             </div>
             <div className="list">
               <ul>
-                <li><a className="item-link list-button" onClick={this.fetchData}>Sign In</a></li>
+                <button type="button" onClick={this.fetchData}>Submit</button>
               </ul>
             </div>
           </form>
