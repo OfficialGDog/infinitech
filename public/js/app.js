@@ -1,4 +1,9 @@
 var app = new Framework7({
+on: {
+  init: function () {
+  console.log('App initialized');
+  },
+},
   // App root element
   root: '#app',
   // App Name
@@ -10,13 +15,8 @@ var app = new Framework7({
     swipe: 'left',
   },
   // Add default routes
-  routes: [
-    {
-      path: '/about/',
-      url: 'about.html',
-    },
-  ],
-  // ... other parameters
+  routes: routes
+
 });
 
 var mainView = app.views.create('.view-main');

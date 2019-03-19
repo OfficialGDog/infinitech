@@ -17,11 +17,6 @@ const router = require('./routes/user.js')
 
 app.use(router)
 
-app.get("/", (req, res) => {
-  console.log("Responding to root route")
-  res.sendFile(path.join(__dirname +'/index.html'));
-})
-
 const PORT = process.env.PORT || 3003
 // localhost:PORT
 app.listen(PORT, () => {

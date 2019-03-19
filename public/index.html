@@ -19,57 +19,55 @@
 </head>
 <body>
     <div id="app">
+    <div class="statusbar"></div>
     <div class="view view-main">
-    <div id="container"></div>
+    <div class="page no-navbar no-toolbar no-swipeback">
+    <div id="container" class="page-content login-screen-content"></div>
     </div>
     </div>
-        <script type="text/javascript" src="js/framework7.min.js"></script>
-        <script type="text/javascript" src="js/initalise.js"></script>
-      <script type="text/babel">
+    </div>
+    <script type="text/javascript" src="js/framework7.min.js"></script>
+		<script src="js/routes.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/babel">
   
-  class Meme extends React.Component{
-  constructor(props){
-      super(props);
-      this.state = {
-          username: "",
-          password: "",
-          data: null
+      class Meme extends React.Component{
+      constructor(props){
+          super(props);
+          this.state = {
+              username: "",
+              password: "",
+              data: null
+          }
       }
-  }
-
-  fetchData = () => {
-      fetch(`https://stormy-coast-58891.herokuapp.com/login?username=${this.state.username}&password=${this.state.password}`)
-      .then(response => response.json())
-      .then(response => {if(response.length == 0) {console.log("User not found :(")} else if(response.length == 1){this.setState({data : response[0]}); console.log("Logged in as: " + response[0].User_Username); console.log(response)} else {console.log("Too many users are associated with that account!")}})
-      .catch(err => console.error(err))
-  }
-  
-  render(){
-  return(
-      <div data-name="home" className="page">
-        <div className="navbar">
-          <div className="navbar-inner">
-            <div className="title">Example Application</div>
-          </div>
-        </div>
-        <div className="page-content login-screen-content">
-          <div className="login-screen-title">Login Demo</div>
+    
+      fetchData = () => {
+          fetch(`https://stormy-coast-58891.herokuapp.com/login?username=${this.state.username}&password=${this.state.password}`)
+          .then(response => response.json())
+          .then(response => {if(response.length == 0) {console.log("User not found :(")} else if(response.length == 1){this.setState({data : response[0]}); console.log("Logged in as: " + response[0].User_Username); console.log(response)} else {console.log("Too many users are associated with that account!")}})
+          .catch(err => console.error(err))
+      }
+      
+      render(){
+      return(
+        <div>
+        <div class="login-screen-title">My App</div>
           <form>
-            <div className="list">
+            <div class="list">
               <ul>
-                <li className="item-content item-input">
-                  <div className="item-inner">
-                    <div className="item-title item-label">Username</div>
-                    <div className="item-input-wrap">
-                      <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
+                <li class="item-content item-input">
+                  <div class="item-inner">
+                    <div class="item-title item-label">Username</div>
+                    <div class="item-input">
+                        <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
                     </div>
                   </div>
                 </li>
-                <li className="item-content item-input">
-                  <div className="item-inner">
-                    <div className="item-title item-label">Password</div>
-                    <div className="item-input-wrap">
-                      <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
+                <li class="item-content item-input">
+                  <div class="item-inner">
+                    <div class="item-title item-label">Password</div>
+                    <div class="item-input">
+                        <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
                     </div>
                   </div>
                 </li>
@@ -78,26 +76,25 @@
             <div className="list">
               <ul>
                 <button type="button" onClick={this.fetchData}>Submit</button>
+                <a className="item-content item-link" href="/expenses/">Go to expenses</a>
               </ul>
             </div>
           </form>
           {this.state.data && (
           <p style={{textAlign: "center"}}>Logged in as: {this.state.data.User_Username}</p>
           )}
-        </div>
-      </div>
-                             
-  );
-  }
-  }
-  
-  ReactDOM.render( 
-  <div>
-  <Meme />
-  </div>,
-  document.querySelector("#container") 
-  );
-  </script>
+          </div>              
+      );
+      }
+      }
+      
+      ReactDOM.render( 
+      <div>
+      <Meme />
+      </div>,
+      document.querySelector("#container") 
+      );
+      </script>
 </body>
 ​
 </html>
