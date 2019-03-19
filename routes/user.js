@@ -16,9 +16,8 @@ router.get("/users", (req, res) => {
 
 router.get('/login', (req, res) => {
     console.log("Logging in with user credientials....")
-    console.log(req.body);
-    const queryString = "SELECT * FROM User WHERE (User_Username = '10gdavies') and (User_Password = 'password')"
-    getConnection().query(queryString, (err, rows, fields) => {
+    const queryString = "SELECT * FROM user WHERE (User_Username = ?) and (User_Password = ?)"
+    getConnection().query(queryString, ['10gdavies', 'password'], (err, rows, fields) => {
         if(err) {
             console.log("Query Failed: " + err)
             return res.sendStatus(500);
