@@ -2,18 +2,6 @@ const express = require('express')
 const mysql = require('mysql')
 const router = express.Router()
 
-router.get("/users", (req, res) => {
-    const connection = getConnection()
-    const queryString = "SELECT * FROM users"
-    connection.query(queryString, (err, rows, fields) => {
-        if(err){
-            console.log("Failed to query for users: " + err)
-            return res.sendStatus(500)
-        }
-        return res.json(rows)
-    })
-})
-
 router.get("/login", (req, res) => {
     console.log("Logging in with user credientials....");
     const {username, password} = req.query;
@@ -28,29 +16,49 @@ router.get("/login", (req, res) => {
     })
 })
 
-
-router.get("/user/:id", (req, res) => {
-    console.log("Fetching user with id: " + req.params.id)
+router.get("/expenses/:id", (req, res) => {
+    console.log("Fetching expenses with id: " + req.params.id)
 
     const connection = getConnection()
 
     const userId = req.params.id
-    const queryString = "SELECT * FROM users WHERE id = ?"
+    const queryString = "SELECT * FROM report WHERE User_ID = ?"
     connection.query(queryString, [userId], (err, rows, fields) => {
         if(err){
-            console.log("Failed to query for users: " + err)
+            console.log("Query failed:" + err)
             return res.sendStatus(500)
         }
 
-        console.log("I Think we fetched user succesffuly!")
- 
-        const users = rows.map((row) => {
-            return {firstName: row.first_name, lastName: row.last_name}
-        })
-
+        console.log("Fetched expenses successfully!")
         return res.json(rows)
     })
+})
 
+router.post('/addexpense', (req, res) => {
+    console.log("Trying to add a new expense...")
+    const User_ID = req.body.userId
+    const Date_Of_Submission = req.body.subdate
+    const Reciept = req.body.reciept
+    const Expense_Desc = req.body.desc
+    const Category = req.body.category
+    const Client_Name = req.body.clientname
+    const Client_Project = req.body.clientproject
+    const Billable = req.body.bill
+    const Payment_Method = req.body.paymeth
+    const Amount = req.body.amount
+    const Evidence = req.body.evidence
+
+    const queryString = "INSERT INTO report (User_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+
+    getConnection().query(queryString, [User_ID, Date_Of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence], (err, results, fields) => {
+        if(err) {
+            console.log("Failed to insert new expense:" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Inserted a new expense with id: ", results.insertId)
+        res.end()
+    })
+    res.end()
 })
 
 const pool = mysql.createPool({
