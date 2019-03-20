@@ -56,24 +56,24 @@
       render(){
       return(
         <div>
-          <h1 class="logintitle">Saggezza</h1>
-            <form class="list">
+          <h1 className="logintitle">Saggezza</h1>
+            <form className="list">
               <ul>
-                <li class="">
-                  <div class="item-content item-input item-input-with-value">
-                    <div class="item-inner">
-                      <div class="item-title item-label">Username</div>
-                      <div class="item-input-wrap">
+                <li>
+                  <div className="item-content item-input item-input-with-value">
+                    <div className="item-inner">
+                      <div className="item-title item-label">Username</div>
+                      <div className="item-input-wrap">
                           <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
                         </div>
                         </div>
                         </div>
                         </li>
                         <li>
-                          <div class="item-content item-input item-input-with-value">
-                            <div class="item-inner">
-                              <div class="item-title item-label">Password</div>
-                              <div class="item-input-wrap">
+                          <div className="item-content item-input item-input-with-value">
+                            <div className="item-inner">
+                              <div className="item-title item-label">Password</div>
+                              <div className="item-input-wrap">
                                   <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
                                 </div>
                                 </div>
@@ -81,17 +81,17 @@
                                 </li>
                                 </ul>
                                 </form>
-                                <div class="list" style={{width: "90%"}}>
+                                <div className="list" style={{width: "90%"}}>
                                   <ul>
                                     <li>
-                                      <button type="button" class="list-button text-color-white bg-color-green" onClick={this.fetchData}>Login</button>
+                                      <button type="button" className="list-button text-color-white bg-color-green" onClick={this.fetchData}>Login</button>
                                       </li></ul><div style={{paddingTop: "25px", textAlign: "center"}}>
                                         <div style={{display: "inline-block"}}>
-                                          <button class="loginBtn loginBtn--facebook">Login with Facebook</button>
+                                          <button className="loginBtn loginBtn--facebook">Login with Facebook</button>
                                           </div>
                                           <br />
                                           <div style={{display: "inline-block"}}>
-                                            <button class="loginBtn loginBtn--google">Login with Google</button>
+                                            <button className="loginBtn loginBtn--google">Login with Google</button>
                                           </div></div></div></div>
       );
       }
