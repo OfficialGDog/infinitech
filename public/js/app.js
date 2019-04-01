@@ -33,9 +33,9 @@ function fetchCategories(id){
   .catch(err => console.error(err))
 }
 
+
 function displayCategories(categories){
   const colors = ['green', 'purple', 'orange', 'red'];
-
   if(categories.length > 0){
     for(var i = 0; i < categories.length; i++){
       let randomcolor = colors[Math.floor(Math.random() * colors.length)];
