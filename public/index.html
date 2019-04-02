@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
@@ -18,19 +19,20 @@
   <!-- Path to your custom app styles-->
   <link rel="stylesheet" type="text/css" href="css/app.css">
 </head>
+
 <body>
-    <div id="app">
+  <div id="app">
     <div class="statusbar"></div>
     <div class="view view-main">
-    <div class="page no-navbar no-toolbar no-swipeback">
-    <div id="container" class="page-content login-screen-content"></div>
+      <div class="page no-navbar no-toolbar no-swipeback">
+        <div id="container" class="page-content login-screen-content"></div>
+      </div>
     </div>
-    </div>
-    </div>
-    <script type="text/javascript" src="js/framework7.min.js"></script>
-		<script src="js/routes.js"></script>
-    <script type="text/javascript" src="js/app.js"></script>
-    <script type="text/babel">
+  </div>
+  <script type="text/javascript" src="js/framework7.min.js"></script>
+  <script src="js/routes.js"></script>
+  <script type="text/javascript" src="js/app.js"></script>
+  <script type="text/babel">
   
       class Meme extends React.Component{
       constructor(props){
@@ -50,7 +52,7 @@
       fetchData = () => {
           fetch(`https://stormy-coast-58891.herokuapp.com/login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
-          .then(response => {if(response.length == 0) {app.dialog.alert("We couldn't find the user! 😭­", "User not found!");} else if(response.length == 1){this.setState({data : response[0]}); app.views.main.router.navigate('/expenses/'); console.log("Logged in as: " + response[0].User_Username); fetchCategories(response[0].User_ID);} else {app.dialog.alert("Too many users are associated with that account! 🤔­", "Error: 4512");}})
+          .then(response => {if(response.length == 0) {app.dialog.alert("We couldn't find the user! 😭­", "User not found!");} else if(response.length == 1){this.setState({data : response[0]}); app.views.main.router.navigate('/categories/'); console.log("Logged in as: " + response[0].User_Username); fetchCategories(response[0].User_ID);} else {app.dialog.alert("Too many users are associated with that account! 🤔­", "Error: 4512");}})
           .catch(err => console.error(err))
       }
       render(){
@@ -106,4 +108,5 @@
       </script>
 </body>
 ​
+
 </html>
