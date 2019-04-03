@@ -2,11 +2,25 @@ const express = require('express')
 const mysql = require('mysql')
 const router = express.Router()
 
-router.get("/login", (req, res) => {
+router.get("/user_login", (req, res) => {
     console.log("Logging in with user credientials....");
     const {username, password} = req.query;
     const connection = getConnection()
     const queryString = `SELECT * FROM user WHERE User_Username = '${username}' and User_Password = '${password}'`
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Failed to query for users: " + err)
+            return res.sendStatus(500)
+        }
+        return res.json(rows)
+    })
+})
+
+router.get("/admin_login", (req, res) => {
+    console.log("Logging in with admin credientials....");
+    const {username, password} = req.query;
+    const connection = getConnection()
+    const queryString = `SELECT * FROM admin WHERE Admin_Username = '${username}' and Admin_Password = '${password}'`
     connection.query(queryString, (err, rows, fields) => {
         if(err){
             console.log("Failed to query for users: " + err)

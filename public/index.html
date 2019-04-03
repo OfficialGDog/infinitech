@@ -39,8 +39,7 @@
           super(props);
           this.state = {
               username: "",
-              password: "",
-              data: null
+              password: ""
           }
       }
 
@@ -50,10 +49,20 @@
       }
     
       fetchData = () => {
-          fetch(`https://stormy-coast-58891.herokuapp.com/login?username=${this.state.username}&password=${this.state.password}`)
+          var isUser = null;
+          var isAdmin = null;
+
+          var user = fetch(`https://stormy-coast-58891.herokuapp.com/user_login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
-          .then(response => {if(response.length == 0) {app.dialog.alert("We couldn't find the user! 😭­", "User not found!");} else if(response.length == 1){this.setState({data : response[0]}); app.views.main.router.navigate('/categories/'); console.log("Logged in as: " + response[0].User_Username); fetchCategories(response[0].User_ID);} else {app.dialog.alert("Too many users are associated with that account! 🤔­", "Error: 4512");}})
+          .then(response => {if(response.length == 1){isUser = true; app.views.main.router.navigate('/categories/'); console.log("Logged in as: " + response[0].User_Username); fetchCategories(response[0].User_ID);}else if(response.length == 0){isUser = false;}})
           .catch(err => console.error(err))
+
+          var admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_login?username=${this.state.username}&password=${this.state.password}`)
+          .then(response => response.json())
+          .then(response => {if(response.length == 1){isAdmin = true; app.views.main.router.navigate('/categories/');} else if(response.length == 0){isAdmin = false;}})
+          .catch(err => console.error(err))
+
+          Promise.all([user,admin]).then(function(){if(isUser == null || isAdmin == null){app.dialog.alert("Unable to connect with server.­", "Connection timed out 🤔"); console.log("Connection to the server failed has failed! Error: 404")} else if(!isUser || !isAdmin){app.dialog.alert("Incorrect username and/or password. Please try again! 🔒­", "Login credentials incorrect!");}})
       }
       render(){
       return(
