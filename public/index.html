@@ -34,7 +34,7 @@
   <script type="text/javascript" src="js/app.js"></script>
   <script type="text/babel">
   
-      class Meme extends React.Component{
+      class Login extends React.Component{
       constructor(props){
           super(props);
           this.state = {
@@ -44,6 +44,7 @@
       }
 
       componentDidMount() {
+         loginOnKeyEnter(document.getElementById("input1"), document.getElementById("input2"), document.getElementById("loginBtn"));
          let pagecontent = document.getElementsByClassName("page-content login-screen-content")[0];
          pagecontent.style = "background-image: url('assets/background2.png');background-position: center;background-repeat: no-repeat;background-size: cover; display: flex; justify-content: center; align-items: center;";
       }
@@ -75,7 +76,7 @@
                     <div className="item-inner">
                       <div className="item-title item-label">Username</div>
                       <div className="item-input-wrap">
-                          <input type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
+                          <input id="input1" type="text" name="username" placeholder="Your username" value={this.state.username} onChange= {event => this.setState({username : event.target.value})} />
                         </div>
                         </div>
                         </div>
@@ -85,7 +86,7 @@
                             <div className="item-inner">
                               <div className="item-title item-label">Password</div>
                               <div className="item-input-wrap">
-                                  <input type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
+                                  <input id="input2" type="password" name="password" placeholder="Your password" value={this.state.password} onChange= {event => this.setState({password : event.target.value})}/>
                                 </div>
                                 </div>
                                 </div>
@@ -95,7 +96,7 @@
                                 <div className="list" style={{width: "90%"}}>
                                   <ul>
                                     <li>
-                                      <button type="button" className="list-button text-color-white bg-color-green" onClick={this.fetchData}>Login</button>
+                                      <button id="loginBtn" type="button" className="list-button text-color-white bg-color-green" onClick={this.fetchData}>Login</button>
                                       </li></ul><div style={{paddingTop: "25px", textAlign: "center"}}>
                                         <div style={{display: "inline-block"}}>
                                           <button className="loginBtn loginBtn--facebook">Login with Facebook</button>
@@ -110,12 +111,10 @@
       
       ReactDOM.render( 
       <div style={{width: "85%", maxWidth: "600px"}}>
-      <Meme />
+      <Login />
       </div>,
       document.querySelector("#container") 
       );
       </script>
 </body>
-​
-
 </html>

@@ -43,6 +43,21 @@ var categories = null;
 var filteredCategories = null;
 var selected_index = null;
 
+function loginOnKeyEnter(input1, input2, button){
+  input1.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+     event.preventDefault();
+     button.click();
+    }
+  });
+  input2.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+     event.preventDefault();
+     button.click();
+    }
+  });
+}
+
 function fetchCategories(id){
   fetch("https://stormy-coast-58891.herokuapp.com/expenses/" + id)
   .then(response => response.json())
