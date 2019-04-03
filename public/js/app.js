@@ -1,4 +1,5 @@
 const colors = ['green', 'purple', 'orange', 'red'];
+var showAdminMessage = false;
 
 var app = new Framework7({
 on: {
@@ -15,6 +16,9 @@ if(page.name=='expenses'){
     }
     selected_index = null;
   }
+}
+else if(page.name=='categories' && showAdminMessage){
+  document.getElementById("categories").innerHTML = "<h1>Admin has logged in.</h1>";
 }
 },
 },
@@ -66,4 +70,8 @@ function displayCategories(allexpenses,categories){
 
 function updateIndex(index){
   selected_index = index;
+}
+
+function test(){
+  showAdminMessage = true;
 }
