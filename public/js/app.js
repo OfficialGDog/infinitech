@@ -89,7 +89,18 @@ if(showAdminMessage){
 }
 }
 else if(page.name == 'addexpenses'){
-  document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
+    /*  Need to find a more
+        efficient way of doing
+        this... Otherwise fetch
+        promise is called twice on
+        page load 👿
+    */    
+
+    document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
+    fetch("https://stormy-coast-58891.herokuapp.com/projects/")
+    .then(response => response.json())
+    .then(response => {updateDropdown(response);})
+    .catch(err => console.error(err))
 }
 },
 },
@@ -166,6 +177,27 @@ function displayCategories(categories){
 
 function updateIndex(index){
   selected_index = index;
+}
+
+function updateDropdown(projectdata){
+  let categoryElement = document.getElementById("category");
+  let projectNameElement = document.getElementById("projectname");
+  let clientNameElement = document.getElementById("clientname");
+
+  for(var i = 0; i < projectdata.length; i++){
+      let option1 = document.createElement("option");
+      option1.text = projectdata[i].Client_Name;
+      clientNameElement.add(option1, clientNameElement[i]);
+      let option2 = document.createElement("option");
+      option2.text = projectdata[i].Project_Name;
+      projectNameElement.add(option2, projectNameElement[i]);
+  }
+
+  fetch("https://stormy-coast-58891.herokuapp.com/categories/")
+  .then(response => response.json())
+  .then(response => {for(var i = 0; i < response.length; i++) {let option = document.createElement("option"); option.text = response[i].Categories; categoryElement.add(option, categoryElement[i]);}})
+  .catch(err => console.error(err))
+
 }
 
 function test(){
