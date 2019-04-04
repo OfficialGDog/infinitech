@@ -1,4 +1,4 @@
-<div class="page" data-name="expenses">
+<div class="page" data-name="addexpenses" data-page="addexpenses">
         <div class="navbar">
           <div class="navbar-inner sliding">
             <div class="left">
@@ -11,8 +11,7 @@
           </div>
         </div>
         <div class="page-content">
-            <div class="block-title">Add your expense</div>
-          <div class="list inline-labels no-hairlines-md">
+          <div class="list no-hairlines-md">
             <ul>
               <li class="item-content item-input">
                 <div class="item-media">
@@ -20,8 +19,8 @@
                 </div>
                 <div class="item-inner">
                     <div class="item-title item-label">Username: </div>
-                    <div class="item-input-wrap">
-                        <input type="text" readonly value="Hello">
+                    <div id="username" class="item-input-wrap">
+                        <p style="color: red;">User not found!</p>
                       </div>
                 </div>
               </li>
@@ -32,7 +31,7 @@
                   <div class="item-inner">
                     <div class="item-title item-label">Date: </div>
                     <div class="item-input-wrap">
-                      <input type="datetime-local" placeholder="Please choose...">
+                      <input type="date" placeholder="Please choose...">
                     </div>
                   </div>
                 </li>
@@ -111,11 +110,14 @@
                               <i class="icon demo-list-icon"></i>
                             </div>
                             <div class="item-inner">
-                              <div class="item-title item-label">Client Project: </div>
-                              <div class="item-input-wrap">
-                                <input type="text" placeholder="Project name">
-                                <span class="input-clear-button"></span>
-                              </div>
+                              <div class="item-title item-label">Project Name: </div>
+                              <div class="item-input-wrap input-dropdown-wrap">
+                              <select placeholder="Please choose...">
+                                <option value="Male">Project Expenses</option>
+                                <option value="Female">Group Work</option>
+                                <option value="Female">Building a wall</option>
+                              </select>
+                            </div>
                             </div>
                           </li>
                           <li class="item-content item-input">
@@ -153,7 +155,7 @@
                                   <div class="item-inner">
                                       <div class="item-title item-label">Amount (£): </div>
                                       <div class="item-input-wrap">
-                                          <input type="text">
+                                          <input type="number">
                                         </div>
                                   </div>
                                 </li>

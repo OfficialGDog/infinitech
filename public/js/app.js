@@ -1,4 +1,5 @@
 const colors = ['green', 'purple', 'orange', 'red'];
+var logindata = null;
 var showAdminMessage = false;
 var expenses = null;
 var filteredCategories = null;
@@ -66,17 +67,15 @@ else if(page.name=='categories'){
     ],
     on: {
     change: function (picker, values, displayValues) {
-      if(document.getElementById("filter").value != displayValues){
+      if(document.getElementById("filter").value != displayValues && !showAdminMessage){
         const column = picker.cols[0];
         switch(displayValues[0]){
           case column.values[0]:
-          // First column selected run code here
-          console.log("Filtering Expenses By Category...")
+          // First column selected run code here...
           displayCategories(filteredCategories);
           break;
           case column.values[1]:
-          // Second column selected run code here
-          console.log("Filtering Expenses By Project...");
+          // Second column selected run code here...
           displayCategories(filteredProject);
           break;
         }
@@ -88,6 +87,9 @@ else if(page.name=='categories'){
 if(showAdminMessage){
   document.getElementById("categories").innerHTML = "<h1>Admin has logged in.</h1>";
 }
+}
+else if(page.name == 'addexpenses'){
+  document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
 }
 },
 },
@@ -123,6 +125,18 @@ function loginOnKeyEnter(input1, input2, button){
      button.click();
     }
   });
+}
+
+function saveLogin(response){
+  if(response[0].hasOwnProperty("User_Username")){
+      logindata = response.map(item => ({name: item.User_Username}));
+  }
+  else if(response[0].hasOwnProperty("Admin_Username")){
+      logindata = response.map(item => ({name: item.Admin_Username}));
+  }
+  else{
+    console.error("Failed to save login information!");
+  }
 }
 
 function fetchExpenses(id){

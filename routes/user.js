@@ -75,6 +75,33 @@ router.post('/addexpense', (req, res) => {
     res.end()
 })
 
+router.get("/projects/", (req, res) => {
+    const connection = getConnection()
+    const queryString = "SELECT Project_Name, Client_Name FROM project"
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Query failed:" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Retrived project information successfully!")
+        return res.json(rows)
+    })
+})
+
+router.get("/categories/", (req, res) => {
+    const connection = getConnection()
+    const queryString = "SELECT * FROM category"
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Query failed:" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Retrieved category information successfully!")
+        return res.json(rows)
+    })
+})
+
+
 const pool = mysql.createPool({
     connectionLimit: 10,
     host: 'us-cdbr-iron-east-03.cleardb.net',
