@@ -6,6 +6,8 @@ var filteredCategories = null;
 var filteredProject = null;
 var projectdata = null;
 var categorydata = null;
+var filterPicker = null;
+var bContinue = false;
 
 var app = new Framework7({
   picker: {
@@ -59,16 +61,18 @@ if(page.name=='expenses'){
   }
 }
 else if(page.name=='categories'){
-  var filterPicker = app.picker.create({
+    filterPicker = app.picker.create({
     inputEl: '#filter',
     cols: [
       {
         textAlign: 'center',
-        values: ['Categories', 'Project Name']
+        values: ['Categories', 'Project Name'],
+        displayValues: ['Categories', 'Project Name']
       }
     ],
     on: {
     change: function (picker, values, displayValues) {
+      bContinue = true;
       if(document.getElementById("filter").value != displayValues && !showAdminMessage){
         const column = picker.cols[0];
         switch(displayValues[0]){
@@ -86,6 +90,7 @@ else if(page.name=='categories'){
     }
   },
 });
+
 if(showAdminMessage){
   document.getElementById("categories").innerHTML = "<h1>Admin has logged in.</h1>";
 }
@@ -241,8 +246,11 @@ function addExpenseReport(){
   .catch(err => console.error(err))
   formData.userId = parseInt(formData.userId);
   formData.amount = "£" + formData.amount;
-  Promise.all([newprojectid]).then(function(){if(hasFetched){app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addexpense', formData); app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); app.views.main.router.back();}})
-  }
+  Promise.all([newprojectid]).then(function(){if(hasFetched){
+  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addexpense', formData); 
+  fetchExpenses(formData.userId); if(bContinue) {filterPicker.setValue([filterPicker.cols[0].values[0]]);}
+  app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); app.views.main.router.back();}})
+}
   else{
     app.dialog.alert("Please ensure all input boxes are filled out!", "Form incomplete ❌");
   }
