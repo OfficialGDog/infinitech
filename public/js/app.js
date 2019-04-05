@@ -136,10 +136,10 @@ function loginOnKeyEnter(input1, input2, button){
 
 function saveLogin(response){
   if(response[0].hasOwnProperty("User_Username")){
-      logindata = response.map(item => ({name: item.User_Username}));
+      logindata = response.map(item => ({name: item.User_Username, id: item.User_ID}));
   }
   else if(response[0].hasOwnProperty("Admin_Username")){
-      logindata = response.map(item => ({name: item.Admin_Username}));
+      logindata = response.map(item => ({name: item.Admin_Username, id: item.Admin_ID}));
   }
   else{
     console.error("Failed to save login information!");
@@ -198,6 +198,7 @@ function displayFormData(){
   categoryElement.style = "";
 
   document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
+  document.getElementById("userid").innerHTML = "<input type='text' name='userId' readonly value='" + logindata[0].id + "'></input>";
 
   if(projectdata.length > 0 && categorydata.length > 0){
     for(var i = 0; i < projectdata.length; i++){
@@ -217,6 +218,21 @@ function displayFormData(){
       projectNameElement.remove(projectdata.length);
       categoryElement.remove(categorydata.length);
   }
+}
+
+function addExpenseReport(){
+  let hasFetched = false;
+
+  var formData = app.form.convertToData('#my-form');
+  let newprojectid = fetch("https://stormy-coast-58891.herokuapp.com/maxprojectid/")
+  .then(response => response.json())
+  .then(response => {if(response.length > 0){ hasFetched = true; formData.reportId = ((response[0].Report_ID) + 1)}})
+  .catch(err => console.error(err))
+
+  formData.userId = parseInt(formData.userId);
+  formData.amount = "£" + formData.amount;
+
+  Promise.all([newprojectid]).then(function(){if(hasFetched){app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addexpense', formData); app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); app.views.main.router.back();}})
 }
 
 function test(){

@@ -11,6 +11,7 @@
           </div>
         </div>
         <div class="page-content">
+          <form id="my-form">
           <div class="list no-hairlines-md">
             <ul>
               <li class="item-content item-input">
@@ -19,6 +20,7 @@
                 </div>
                 <div class="item-inner">
                     <div class="item-title item-label">Username: </div>
+                    <div id="userid" style="display: none;"></div>
                     <div id="username" class="item-input-wrap">
                         <p style="color: red;">User not found!</p>
                       </div>
@@ -31,7 +33,7 @@
                   <div class="item-inner">
                     <div class="item-title item-label">Date: </div>
                     <div class="item-input-wrap">
-                      <input type="date" placeholder="Please choose...">
+                      <input type="date" name="subdate" placeholder="Please choose...">
                     </div>
                   </div>
                 </li>
@@ -42,9 +44,9 @@
                     <div class="item-inner">
                       <div class="item-title item-label">Reciept: </div>
                       <div class="item-input-wrap input-dropdown-wrap">
-                        <select placeholder="Please choose...">
-                          <option value="Male">Yes - Soft Copy</option>
-                          <option value="Female">No - No Reciept</option>
+                        <select placeholder="Please choose..." name="reciept">
+                          <option value="yes">Yes - Soft Copy</option>
+                          <option value="no">No - No Reciept</option>
                         </select>
                       </div>
                     </div>
@@ -56,7 +58,7 @@
                       <div class="item-inner">
                         <div class="item-title item-label">Description: </div>
                         <div class="item-input-wrap">
-                          <textarea placeholder="Description goes here.."></textarea>
+                          <textarea name="desc" placeholder="Description goes here.."></textarea>
                         </div>
                       </div>
                     </li>
@@ -67,8 +69,8 @@
                         <div class="item-inner">
                           <div class="item-title item-label">Category: </div>
                           <div class="item-input-wrap input-dropdown-wrap">
-                            <select id="category" placeholder="Please choose..." style="color: red">
-                                <option value="" hidden>Categories not found!</option>
+                            <select name="category" id="category" placeholder="Please choose..." style="color: red">
+                                <option value="" hidden>Loading...</option>
                             </select>
                           </div>
                         </div>
@@ -80,8 +82,8 @@
                           <div class="item-inner">
                             <div class="item-title item-label">Client Name: </div>
                             <div class="item-input-wrap input-dropdown-wrap">
-                              <select id="clientname" placeholder="Please choose..." style="color: red">
-                                  <option value="" hidden>Client name not found!</option>
+                              <select name="clientname" id="clientname" placeholder="Please choose..." style="color: red">
+                                  <option value="" hidden>Loading...</option>
                               </select>
                             </div>
                           </div>
@@ -93,8 +95,8 @@
                             <div class="item-inner">
                               <div class="item-title item-label">Project Name: </div>
                               <div class="item-input-wrap input-dropdown-wrap">
-                              <select id="projectname" placeholder="Please choose..." style="color: red">
-                                  <option value="" hidden>Project name not found!</option>
+                              <select name="clientproject" id="projectname" placeholder="Please choose..." style="color: red">
+                                  <option value="" hidden>Loading...</option>
                               </select>
                             </div>
                             </div>
@@ -106,9 +108,9 @@
                               <div class="item-inner">
                                 <div class="item-title item-label">Billable to Client: </div>
                                 <div class="item-input-wrap input-dropdown-wrap">
-                                  <select placeholder="Please choose...">
-                                    <option value="Male">Yes</option>
-                                    <option value="Female">No</option>
+                                  <select name="bill" placeholder="Please choose...">
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
                                   </select>
                                 </div>
                               </div>
@@ -120,9 +122,9 @@
                                 <div class="item-inner">
                                   <div class="item-title item-label">Payment Method: </div>
                                   <div class="item-input-wrap input-dropdown-wrap">
-                                    <select placeholder="Please choose...">
-                                      <option value="Male">Own Payment</option>
-                                      <option value="Female">Corporate Card</option>
+                                    <select name="paymeth" placeholder="Please choose...">
+                                      <option value="Own Payment">Own Payment</option>
+                                      <option value="Corporate Card">Corporate Card</option>
                                     </select>
                                   </div>
                                 </div>
@@ -134,12 +136,24 @@
                                   <div class="item-inner">
                                       <div class="item-title item-label">Amount (£): </div>
                                       <div class="item-input-wrap">
-                                          <input type="number">
+                                          <input name="amount" type="number">
                                         </div>
                                   </div>
                                 </li>
+                                <li class="item-content item-input">
+                                    <div class="item-media">
+                                      <i class="icon demo-list-icon"></i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Evidence: </div>
+                                        <div class="item-input-wrap">
+                                            <input type="file" name="evidence" accept="image/png, image/jpeg">
+                                          </div>
+                                    </div>
+                                  </li>
             </ul>
-            <button type="button" class="list-button text-color-white bg-color-green" style="max-width: 300px; border-radius: 10px; margin-top: 25px;margin:auto;display:block;" onclick="app.dialog.alert('WIP: Currently going under full maintenance plz stand by ⚙️🔨🤓', 'Status: Working Extremely Hard To Get This Working!')">Add Expense</button>
+            <button type="button" class="list-button text-color-white bg-color-green" style="max-width: 300px; border-radius: 10px; margin-top: 25px;margin:auto;display:block;" onclick="addExpenseReport()">Add Expense</button>
           </div>
+          </form>
         </div>
       </div>

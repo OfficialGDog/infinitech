@@ -1,6 +1,8 @@
 const express = require('express')
 const mysql = require('mysql')
 const router = express.Router()
+const bodyParser = require('body-parser')
+var urlencodedParser = bodyParser.urlencoded({extended: false});
 
 router.get("/user_login", (req, res) => {
     console.log("Logging in with user credientials....");
@@ -48,31 +50,35 @@ router.get("/expenses/:id", (req, res) => {
     })
 })
 
-router.post('/addexpense', (req, res) => {
+router.post('/addexpense', urlencodedParser, function(req, res) {
     console.log("Trying to add a new expense...")
-    const User_ID = req.body.userId
-    const Date_Of_Submission = req.body.subdate
-    const Reciept = req.body.reciept
-    const Expense_Desc = req.body.desc
-    const Category = req.body.category
-    const Client_Name = req.body.clientname
-    const Client_Project = req.body.clientproject
-    const Billable = req.body.bill
-    const Payment_Method = req.body.paymeth
-    const Amount = req.body.amount
-    const Evidence = req.body.evidence
-
-    const queryString = "INSERT INTO report (User_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
-
-    getConnection().query(queryString, [User_ID, Date_Of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence], (err, results, fields) => {
+    console.log(req.body);
+	var params = [req.body.userId,req.body.reportId,req.body.subdate,req.body.reciept,req.body.desc,req.body.category,req.body.clientname,req.body.clientproject,req.body.bill,req.body.paymeth,req.body.amount];
+  
+    const queryString = "INSERT INTO report (User_ID, Report_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+  
+    getConnection().query(queryString, params, function (err, results, fields) {
         if(err) {
             console.log("Failed to insert new expense:" + err)
             return res.sendStatus(500)
         }
-        console.log("Inserted a new expense with id: ", results.insertId)
+        console.log("Inserted a new expense")
         res.end()
     })
     res.end()
+  })
+
+  router.get("/maxprojectid/", (req, res) => {
+    const connection = getConnection()
+    const queryString = "SELECT MAX(Report_ID) AS Report_ID FROM report"
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Query failed:" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Retrived project information successfully!")
+        return res.json(rows)
+    })
 })
 
 router.get("/projects/", (req, res) => {
