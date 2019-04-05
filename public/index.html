@@ -53,15 +53,15 @@
       }
     
       fetchData = () => {
-          var isUser = null;
-          var isAdmin = null;
+          let isUser = null;
+          let isAdmin = null;
 
-          var user = fetch(`https://stormy-coast-58891.herokuapp.com/user_login?username=${this.state.username}&password=${this.state.password}`)
+          let user = fetch(`https://stormy-coast-58891.herokuapp.com/user_login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
           .then(response => {if(response.length == 1){isUser = true; app.views.main.router.navigate('/categories/'); console.log("Logged in as: " + response[0].User_Username); fetchExpenses(response[0].User_ID); saveLogin(response);}else if(response.length == 0){isUser = false;}})
           .catch(err => console.error(err))
 
-          var admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_login?username=${this.state.username}&password=${this.state.password}`)
+          let admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
           .then(response => {if(response.length == 1){isAdmin = true; app.views.main.router.navigate('/categories/'); test(); saveLogin(response);} else if(response.length == 0){isAdmin = false;}})
           .catch(err => console.error(err))

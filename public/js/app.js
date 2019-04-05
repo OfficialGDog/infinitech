@@ -4,6 +4,8 @@ var showAdminMessage = false;
 var expenses = null;
 var filteredCategories = null;
 var filteredProject = null;
+var projectdata = null;
+var categorydata = null;
 
 var app = new Framework7({
   picker: {
@@ -89,18 +91,12 @@ if(showAdminMessage){
 }
 }
 else if(page.name == 'addexpenses'){
-    /*  Need to find a more
-        efficient way of doing
-        this... Otherwise fetch
-        promise is called twice on
-        page load 👿
-    */    
-
-    document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
-    fetch("https://stormy-coast-58891.herokuapp.com/projects/")
-    .then(response => response.json())
-    .then(response => {updateDropdown(response);})
-    .catch(err => console.error(err))
+    if(projectdata == null || categorydata == null){
+      fetchFormData();
+    }
+    else{
+      displayFormData();
+    }
 }
 },
 },
@@ -179,25 +175,48 @@ function updateIndex(index){
   selected_index = index;
 }
 
-function updateDropdown(projectdata){
-  let categoryElement = document.getElementById("category");
-  let projectNameElement = document.getElementById("projectname");
-  let clientNameElement = document.getElementById("clientname");
-
-  for(var i = 0; i < projectdata.length; i++){
-      let option1 = document.createElement("option");
-      option1.text = projectdata[i].Client_Name;
-      clientNameElement.add(option1, clientNameElement[i]);
-      let option2 = document.createElement("option");
-      option2.text = projectdata[i].Project_Name;
-      projectNameElement.add(option2, projectNameElement[i]);
-  }
-
-  fetch("https://stormy-coast-58891.herokuapp.com/categories/")
+function fetchFormData(){
+  let datapack1 = fetch("https://stormy-coast-58891.herokuapp.com/projects/")
   .then(response => response.json())
-  .then(response => {for(var i = 0; i < response.length; i++) {let option = document.createElement("option"); option.text = response[i].Categories; categoryElement.add(option, categoryElement[i]);}})
-  .catch(err => console.error(err))
+  .then(response => {if(response.length > 0){projectdata = response.slice(0)} else{projectdata = false}})
+  .catch(err => console.error(err), projectdata = false)
 
+  let datapack2 = fetch("https://stormy-coast-58891.herokuapp.com/categories/")
+  .then(response => response.json())
+  .then(response => {if(response.length > 0) {categorydata = response.slice(0)} else{categorydata = false}})
+  .catch(err => console.error(err), categorydata = false)
+
+  Promise.all([datapack1,datapack2]).then(function(){if(categorydata && projectdata){displayFormData()} else {console.error("Failed to fetch data :(")}})
+}
+
+function displayFormData(){
+  let clientNameElement = document.getElementById("clientname");
+  let projectNameElement = document.getElementById("projectname");
+  let categoryElement = document.getElementById("category");
+  clientNameElement.style = "";
+  projectNameElement.style = "";
+  categoryElement.style = "";
+
+  document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
+
+  if(projectdata.length > 0 && categorydata.length > 0){
+    for(var i = 0; i < projectdata.length; i++){
+      let option = document.createElement("option"); 
+      option.text = projectdata[i].Client_Name; 
+      clientNameElement.add(option, clientNameElement[i]); 
+      let option2 = document.createElement("option"); 
+      option2.text = projectdata[i].Project_Name; 
+      projectNameElement.add(option2, projectNameElement[i])
+    }
+    for(var i = 0; i < categorydata.length; i++) {
+      let option = document.createElement("option"); 
+      option.text = categorydata[i].Categories; 
+      categoryElement.add(option, categoryElement[i]);
+    }
+      clientNameElement.remove(projectdata.length);
+      projectNameElement.remove(projectdata.length);
+      categoryElement.remove(categorydata.length);
+  }
 }
 
 function test(){
