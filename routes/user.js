@@ -50,6 +50,24 @@ router.get("/expenses/:id", (req, res) => {
     })
 })
 
+router.get("/adminexpenses/:id", (req, res) => {
+    console.log("Fetching admin expenses with id: " + req.params.id)
+
+    const connection = getConnection()
+
+    const userId = req.params.id
+    const queryString = "SELECT Admin_ID, report.User_ID, report_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence FROM user, report WHERE user.User_ID = report.User_ID AND Admin_Id = ?"
+    connection.query(queryString, [userId], (err, rows, fields) => {
+        if(err){
+            console.log("Query failed:" + err)
+            return res.sendStatus(500)
+        }
+
+        console.log("Fetched admin expenses successfully!")
+        return res.json(rows)
+    })
+})
+
 router.post('/addexpense', urlencodedParser, function(req, res) {
     console.log("Trying to add a new expense...")
     console.log(req.body);
