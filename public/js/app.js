@@ -1,6 +1,5 @@
 const colors = ['green', 'purple', 'orange', 'red'];
 var logindata = null;
-var showAdminMessage = false;
 var expenses = null;
 var filteredCategories = null;
 var filteredProject = null;
@@ -73,7 +72,7 @@ else if(page.name=='categories'){
     on: {
     change: function (picker, values, displayValues) {
       bContinue = true;
-      if(document.getElementById("filter").value != displayValues && !showAdminMessage){
+      if(document.getElementById("filter").value != displayValues){
         const column = picker.cols[0];
         switch(displayValues[0]){
           case column.values[0]:
@@ -90,10 +89,6 @@ else if(page.name=='categories'){
     }
   },
 });
-
-if(showAdminMessage){
-  document.getElementById("categories").innerHTML = "<h1>Admin has logged in.</h1>";
-}
 }
 else if(page.name == 'addexpenses'){
     if(projectdata == null || categorydata == null){
@@ -156,6 +151,52 @@ function fetchExpenses(id){
   .then(response => response.json())
   .then(response => {expenses = response.slice(0); let array = response.map((item) => item.Category); let listofcategories = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {}); var categoryarray = Object.keys(listofcategories).map(item => ({name: item, count: listofcategories[item]})); filteredCategories = categoryarray.slice(0); displayCategories(categoryarray); let array2 =  response.map((item) => item.Client_Project); let listofprojects = array2.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {}); var projectarray = Object.keys(listofprojects).map(item => ({name: item, count: listofprojects[item]})); filteredProject = projectarray.slice(0);})
   .catch(err => console.error(err))
+}
+
+function fetchAdminExpenses(id){
+  fetch("https://stormy-coast-58891.herokuapp.com/adminexpenses/" + id)
+  .then(response => response.json())
+  .then(response => {expenses = response.slice(0); displayAdminExpenses()})
+  .catch(err => console.error(err))
+}
+
+function displayAdminExpenses(){
+  let counter = 0;
+  let position = 0;
+  while(document.getElementById("expenselist").innerHTML != null) {
+  for(var i = 0; i < expenses.length; i++){
+    let Old_UserID = null;
+    if(i > 0){Old_UserID = expenses[(i - 1)].User_ID;} else {document.getElementById("expenselist").innerHTML = "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + "User ID: " + expenses[0].User_ID + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user0" + "></ul></div></div></div></div>"; injectAdminCategories(expenses[0].User_ID, 0);}
+    let Current_UserID = expenses[i].User_ID;
+
+    if(Old_UserID != Current_UserID && Old_UserID != null){
+    counter++;
+    position += 60;
+    document.getElementById("expenselist").innerHTML += "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent; top: -" + position + "px'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + "User ID: " + expenses[i].User_ID + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user" + counter + "></ul></div></div></div></div>"; injectAdminCategories(expenses[i].User_ID, counter);
+    }
+  }
+  break;
+}
+}
+
+function injectAdminCategories(id, counter){
+  let array = [];
+  for(var i = 0; i < expenses.length; i++){
+    if(id == expenses[i].User_ID)
+    {
+      array.push(expenses[i].Client_Project);
+    }
+}
+let arrayreduced = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {});
+let filteredarray = Object.keys(arrayreduced).map(item => ({name: item, count: arrayreduced[item]}));
+
+for(var i = 0; i < filteredarray.length; i++){
+  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses() + "</div></div></li>";
+}
+}
+
+function injectAdminExpenses() {
+  return "<table><thead><tr><th class='checkbox-cell'><label class='checkbox'><input type='checkbox' disabled><i class='icon-checkbox'></i></label></th><th class='label-cell'>Project Name:</th><th class='numeric-cell'>Report ID:</th><th class='numeric-cell'>Description:</th><th class='numeric-cell'>Category:</th><th class='numeric-cell'>Amount:</th><th class='numeric-cell'>Approve / Reject:</th></tr></thead><tbody><tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>Project Thomas</td><td class='numeric-cell' data-collapsible-title='Report ID:'>#2</td><td class='numeric-cell' data-collapsible-title='Description:'>Another paragraph for placeholder text goes here...</td><td class='numeric-cell' data-collapsible-title='Category:'>Consumable</td><td class='numeric-cell' data-collapsible-title='Amount:'>£432</td><td class='actions-cell'><a class='link icon-only'><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr></tbody></table>";
 }
 
 function displayCategories(categories){
@@ -254,8 +295,4 @@ function addExpenseReport(){
   else{
     app.dialog.alert("Please ensure all input boxes are filled out!", "Form incomplete ❌");
   }
-}
-
-function test(){
-  showAdminMessage = true;
 }

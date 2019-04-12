@@ -15,4 +15,8 @@ routes = [
       path: '/add_expense/',
       url: './addexpense.html',
     },
+    {
+      path: '/admin/',
+      url: './admin.html',
+    },
   ];

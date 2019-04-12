@@ -99,6 +99,19 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
     })
 })
 
+router.get("/users/", (req, res) => {
+    const connection = getConnection()
+    const queryString = "SELECT user_username, user_id FROM user"
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Query failed:" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Retrived users successfully!")
+        return res.json(rows)
+    })
+})
+
 router.get("/projects/", (req, res) => {
     const connection = getConnection()
     const queryString = "SELECT Project_Name, Client_Name FROM project"

@@ -25,6 +25,9 @@
 
 <body>
   <div id="app">
+    <div class="panel panel-left panel-reveal">
+         <h1>Hello world</h1>
+    </div>
     <div class="statusbar"></div>
     <div class="view view-main">
       <div class="page no-navbar no-toolbar no-swipeback">
@@ -63,7 +66,7 @@
 
           let admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
-          .then(response => {if(response.length == 1){isAdmin = true; app.views.main.router.navigate('/categories/'); test(); saveLogin(response);} else if(response.length == 0){isAdmin = false;}})
+          .then(response => {if(response.length == 1){isAdmin = true; app.views.main.router.navigate('/admin/'); fetchAdminExpenses(response[0].Admin_ID); saveLogin(response);} else if(response.length == 0){isAdmin = false;}})
           .catch(err => console.error(err))
 
           Promise.all([user,admin]).then(function(){if(isUser == null || isAdmin == null){app.dialog.alert("Unable to connect with server.­", "Connection timed out 🤔"); console.log("Connection to the server failed has failed! Error: 404")} else if(!isUser && !isAdmin){app.dialog.alert("Incorrect username and/or password. Please try again! 🔒­", "Login credentials incorrect!");}})
