@@ -120,7 +120,7 @@ input {
   margin: auto;
   z-index: 1;
   position: relative;
-  height: 15vh;
+  height: 100px;
   margin-bottom: 15px;
   -webkit-perspective: 2000px;
           perspective: 2000px;
@@ -190,7 +190,7 @@ input {
 .card__part__inner {
   overflow: hidden;
   position: relative;
-  height: 10.5vh;
+  height: 100px;
   border-radius: inherit;
 }
 .card__text {
