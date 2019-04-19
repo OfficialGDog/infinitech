@@ -120,7 +120,12 @@ else if(page.name == 'admin'){
 });
 
 var dynamicPopup = app.popup.create({
-  content: '<div class="popup"><div class="block"><div id="alertmessage"></div><div class="list inset"><ul><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="text" placeholder="Username"><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..."></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" placeholder="E-mail"><span class="input-clear-button"></span></div></div></li></ul></div></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%"><div class="col"><a class="button popup-close button-fill-md color-red" href="#">Cancel</a></div><div class="col"><a class="button button-fill-md color-green" href="#">Confirm</a></div></div></div></div>',
+  content: '<div class="popup"><div class="block" style="height:100%"><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
+  on: {
+    opened: function (popup) {
+      loaded();
+    },
+  }
 });
 
 var mainView = app.views.create('.view-main');
@@ -180,22 +185,21 @@ function displayAdminExpenses(){
   let counter = 0;
   let position = 0;
 
-  while(bContinue == false){} 
   for(var i = 0; i < expenses.length; i++){
     let Old_UserID = null;
-    if(i > 0){Old_UserID = expenses[(i - 1)].User_ID;} else {const index = projectdata.map(e => e.user_id).indexOf(expenses[0].User_ID); document.getElementById("expenselist").innerHTML = "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user0" + "></ul></div></div></div></div>"; injectAdminCategories(expenses[0].User_ID, 0);}
+    if(i > 0){Old_UserID = expenses[(i - 1)].User_ID;} else {const index = projectdata.map(e => e.user_id).indexOf(expenses[0].User_ID); document.getElementById("expenselist").innerHTML = "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user0" + "></ul></div></div></div></div>"; injectAdminCategories(expenses[0].User_ID, 0, projectdata[index].user_username);}
     let Current_UserID = expenses[i].User_ID;
 
     if(Old_UserID != Current_UserID && Old_UserID != null){
     const index = projectdata.map(e => e.user_id).indexOf(expenses[i].User_ID);
     counter++;
     position += 60;
-    document.getElementById("expenselist").innerHTML += "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent; top: -" + position + "px'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user" + counter + "></ul></div></div></div></div>"; injectAdminCategories(expenses[i].User_ID, counter);
+    document.getElementById("expenselist").innerHTML += "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent; top: -" + position + "px'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user" + counter + "></ul></div></div></div></div>"; injectAdminCategories(expenses[i].User_ID, counter, projectdata[index].user_username);
     }
   }
 }
 
-function injectAdminCategories(id, counter){
+function injectAdminCategories(id, counter, username){
   let array = [];
   let userexpenses = [];
   for(var i = 0; i < expenses.length; i++){
@@ -209,16 +213,16 @@ let arrayreduced = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0
 let filteredarray = Object.keys(arrayreduced).map(item => ({name: item, count: arrayreduced[item]}));
 
 for(var i = 0; i < filteredarray.length; i++){
-  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses(filteredarray[i].name, userexpenses) + "</div></div></li>";
+  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses(filteredarray[i].name, userexpenses, username) + "</div></div></li>";
 }
 }
 
-function injectAdminExpenses(name, userexpenses) {
+function injectAdminExpenses(name, userexpenses, username) {
   let rows = "";
   for(var i = 0; i < userexpenses.length; i++){
     if(userexpenses[i].Client_Project == name)
     {
-      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
+      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
     }
   }
     return "<table><thead><tr><th class='checkbox-cell'><label class='checkbox'><input type='checkbox' disabled><i class='icon-checkbox'></i></label></th><th class='label-cell'>Project Name:</th><th class='numeric-cell'>Report ID:</th><th class='numeric-cell'>Description:</th><th class='numeric-cell'>Category:</th><th class='numeric-cell'>Amount:</th><th class='numeric-cell'>Approve / Reject:</th></tr></thead><tbody>" + rows + "</tbody></table>";
@@ -232,7 +236,7 @@ function displayCategories(categories){
         let randomcolor = colors[Math.floor(Math.random() * colors.length)];
         let multiples = "s";
         if(categories[i].count > 1) {multiples = "s"} else {multiples = ""}
-        document.getElementById("categories").innerHTML += "<a href='/expenses/' data-force='true' data-ignore-cache='true' onclick=" + "'updateIndex(" + i + ")'" + "><div class='card theme-" + randomcolor + "' style='margin-top: 25px; padding-top: 25px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>£3839.23</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + categories[i].name + "</h3><p class='card__greytext' style='width: 150px'>" + categories[i].count + " Expense" + multiples + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>Awaiting confirmation...</div></div></div></div></div><a>";
+        document.getElementById("categories").innerHTML += "<a href='/expenses/' data-force='true' data-ignore-cache='true' onclick=" + "'updateIndex(" + i + ")'" + "><div class='card theme-" + randomcolor + "' style='margin-top: 25px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>£3839.23</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + categories[i].name + "</h3><p class='card__greytext' style='width: 150px'>" + categories[i].count + " Expense" + multiples + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>Awaiting confirmation...</div></div></div></div></div><a>";
       }
     }
     else{
@@ -322,12 +326,25 @@ function addExpenseReport(){
   }
 }
 
-function approveExpense(id){
+function approveExpense(id, username, desc, category, amount){
   dynamicPopup.open();
   document.getElementById("alertmessage").innerHTML = '<h1 style="text-align: center">Approve Report #' + id + '</h1><h3 style="text-align: center">Are you sure you want to approve this expense report?</h3>';
+  document.getElementById("name").value = username;
+  document.getElementById("message").value = "Your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been approved! 😄👏";
 }
 
-function rejectExpense(id){
+function rejectExpense(id, username, desc, category, amount){
   dynamicPopup.open();
   document.getElementById("alertmessage").innerHTML = '<h1 style="text-align: center">Reject Report #' + id + '</h1><h3 style="text-align: center">Are you sure you want to reject this expense report?</h3>';
+  document.getElementById("name").value = username;
+  document.getElementById("message").value = "Sorry your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been rejected! 😭";
+}
+
+function updateFormEmail(){
+  document.getElementById("myForm").setAttribute("data-email", document.getElementById("email").value);
+}
+
+function displayFormSuccess(){
+  dynamicPopup.close();
+  app.dialog.alert("Your email has been sent successfully! 😄", "Email was sent to user");
 }
