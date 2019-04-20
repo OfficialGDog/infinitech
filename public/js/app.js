@@ -342,12 +342,11 @@ function addExpenseReport(){
 function removeExpenseReport(){
   // Define expense id object for database deletion. 
   let id = {id: expenses[selected_index].report_ID}
-  // If admin approves expense run this code.
-  if(bContinue){
-    // Copy the report into the archive table.
-    let archived = {userId: expenses[selected_index].User_ID, reportId: expenses[selected_index].report_ID, subdate: expenses[selected_index].Date_of_Submission, reciept: expenses[selected_index].Reciept, desc: expenses[selected_index].Expense_Desc, category: expenses[selected_index].Category, clientname: expenses[selected_index].Client_Name, clientproject: expenses[selected_index].Client_Project, bill: expenses[selected_index].Billable, paymeth: expenses[selected_index].Payment_Method, amount: expenses[selected_index].Amount}
-    app.request.postJSON('https://stormy-coast-58891.herokuapp.com/archiveexpense', archived);
-  }
+
+  // Copy the report into the archive table.
+  let archived = {userId: expenses[selected_index].User_ID, reportId: expenses[selected_index].report_ID, subdate: expenses[selected_index].Date_of_Submission, reciept: expenses[selected_index].Reciept, desc: expenses[selected_index].Expense_Desc, category: expenses[selected_index].Category, clientname: expenses[selected_index].Client_Name, clientproject: expenses[selected_index].Client_Project, bill: expenses[selected_index].Billable, paymeth: expenses[selected_index].Payment_Method, amount: expenses[selected_index].Amount};
+  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/archiveexpense', archived);
+  
   // Remove the report from the report table in the database.
   app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deleteexpense', id);
   // Remove expense from the front end.
@@ -362,7 +361,6 @@ function approveExpense(id, username, desc, category, amount){
   document.getElementById("name").value = username;
   document.getElementById("message").value = "Your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been approved! 😄👏";
   updateIndex(expenses.findIndex(item => item.report_ID === id));
-  bContinue = true;
 }
 
 function rejectExpense(id, username, desc, category, amount){
@@ -371,7 +369,6 @@ function rejectExpense(id, username, desc, category, amount){
   document.getElementById("name").value = username;
   document.getElementById("message").value = "Sorry your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been rejected! 😭";
   updateIndex(expenses.findIndex(item => item.report_ID === id));
-  bContinue = false;
 }
 
 function updateFormEmail(){
