@@ -161,8 +161,18 @@ function saveLogin(response){
 function fetchExpenses(id){
   fetch("https://stormy-coast-58891.herokuapp.com/expenses/" + id)
   .then(response => response.json())
-  .then(response => {expenses = response.slice(0); let array = response.map((item) => item.Category); let listofcategories = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {}); var categoryarray = Object.keys(listofcategories).map(item => ({name: item, count: listofcategories[item]})); filteredCategories = categoryarray.slice(0); displayCategories(categoryarray); let array2 =  response.map((item) => item.Client_Project); let listofprojects = array2.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {}); var projectarray = Object.keys(listofprojects).map(item => ({name: item, count: listofprojects[item]})); filteredProject = projectarray.slice(0);})
+  .then(response => {expenses = response.slice(0); updateUserExpenses(); console.log(expenses)})
   .catch(err => console.error(err))
+}
+
+function updateUserExpenses(){
+  let array = expenses.map((item) => item.Category); 
+  let listofcategories = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {}); 
+  let categoryarray = Object.keys(listofcategories).map(item => ({name: item, count: listofcategories[item]})); 
+  filteredCategories = categoryarray.slice(0); displayCategories(categoryarray); 
+  let array2 =  expenses.map((item) => item.Client_Project); 
+  let listofprojects = array2.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {}); 
+  let projectarray = Object.keys(listofprojects).map(item => ({name: item, count: listofprojects[item]})); filteredProject = projectarray.slice(0);
 }
 
 function fetchAdminExpenses(id){
@@ -315,8 +325,14 @@ function addExpenseReport(){
   formData.amount = "£" + formData.amount;
   Promise.all([newprojectid]).then(function(){if(hasFetched){
   app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addexpense', formData); 
-  fetchExpenses(formData.userId); if(bContinue) {filterPicker.setValue([filterPicker.cols[0].values[0]]);}
+  if(bContinue) {filterPicker.setValue([filterPicker.cols[0].values[0]]);}
+  // Update the front end
+  let newobject = {User_ID: formData.userId, Report_ID: formData.reportId, Date_of_Submission: formData.subdate, Reciept: formData.reciept, Expense_Desc: formData.desc, Category: formData.category, Client_Name: formData.clientname, Client_Project: formData.clientproject, Billable: formData.bill, Payment_Method: formData.paymeth, Amount: formData.amount};
+  expenses.push(newobject);
+  updateUserExpenses();
+
   app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); app.views.main.router.back();}})
+
 }
   else{
     app.dialog.alert("Please ensure all input boxes are filled out!", "Form incomplete ❌");
