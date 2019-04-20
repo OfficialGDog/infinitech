@@ -76,7 +76,6 @@
         return false;
       }
     } else {
-      disableAllButtons(form);
       var url = form.action;
       var xhr = new XMLHttpRequest();
       xhr.open('POST', url);
@@ -112,10 +111,3 @@
       forms[i].addEventListener("submit", handleFormSubmit, false);
     }
   };
-
-  function disableAllButtons(form) {
-    var buttons = form.querySelectorAll("button");
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].disabled = true;
-    }
-  }

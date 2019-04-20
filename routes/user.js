@@ -50,6 +50,22 @@ router.get("/expenses/:id", (req, res) => {
     })
 })
 
+router.post('/deleteexpense', urlencodedParser, function(req, res) {
+    console.log("Attempting to delete an expense...")
+	  
+    const queryString = "DELETE FROM report WHERE Report_ID = ?"
+  
+    getConnection().query(queryString, [req.body.id], function (err, results, fields) {
+        if(err) {
+            console.log("Failed to delete expense" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Deleted expense report!")
+        res.end()
+    })
+    res.end()
+  })
+
 router.get("/adminexpenses/:id", (req, res) => {
     console.log("Fetching admin expenses with id: " + req.params.id)
 
@@ -81,6 +97,23 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
             return res.sendStatus(500)
         }
         console.log("Inserted a new expense")
+        res.end()
+    })
+    res.end()
+  })
+
+  router.post('/archiveexpense', urlencodedParser, function(req, res) {
+    console.log("Copying expense into archive table...")
+	var params = [req.body.userId,req.body.reportId,req.body.subdate,req.body.reciept,req.body.desc,req.body.category,req.body.clientname,req.body.clientproject,req.body.bill,req.body.paymeth,req.body.amount];
+  
+    const queryString = "INSERT INTO archive (User_ID, Report_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+  
+    getConnection().query(queryString, params, function (err, results, fields) {
+        if(err) {
+            console.log("Failed to move expense into archive table:" + err)
+            return res.sendStatus(500)
+        }
+        console.log("Expense was successfully inserted into archive table.")
         res.end()
     })
     res.end()

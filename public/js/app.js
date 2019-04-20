@@ -1,4 +1,5 @@
 const colors = ['green', 'purple', 'orange', 'red'];
+var userexpenses = [];
 var logindata = null;
 var expenses = null;
 var filteredCategories = null;
@@ -6,6 +7,7 @@ var filteredProject = null;
 var projectdata = null;
 var categorydata = null;
 var filterPicker = null;
+var selected_index = null;
 var bContinue = false;
 
 var app = new Framework7({
@@ -100,7 +102,6 @@ else if(page.name == 'addexpenses'){
 }
 else if(page.name == 'admin'){
   console.log("admin page loaded!");
-  bContinue = true;
 }
 },
 },
@@ -120,7 +121,7 @@ else if(page.name == 'admin'){
 });
 
 var dynamicPopup = app.popup.create({
-  content: '<div class="popup"><div class="block" style="height:100%"><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
+  content: '<div class="popup"><div class="block" style="height:100%"><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess();' + 'removeExpenseReport()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
   on: {
     opened: function (popup) {
       loaded();
@@ -129,8 +130,6 @@ var dynamicPopup = app.popup.create({
 });
 
 var mainView = app.views.create('.view-main');
-
-var selected_index = null;
 
 function loginOnKeyEnter(input1, input2, button){
   input1.addEventListener("keyup", function(event) {
@@ -184,7 +183,6 @@ function fetchAdminExpenses(id){
 function displayAdminExpenses(){
   let counter = 0;
   let position = 0;
-
   for(var i = 0; i < expenses.length; i++){
     let Old_UserID = null;
     if(i > 0){Old_UserID = expenses[(i - 1)].User_ID;} else {const index = projectdata.map(e => e.user_id).indexOf(expenses[0].User_ID); document.getElementById("expenselist").innerHTML = "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user0" + "></ul></div></div></div></div>"; injectAdminCategories(expenses[0].User_ID, 0, projectdata[index].user_username);}
@@ -201,7 +199,7 @@ function displayAdminExpenses(){
 
 function injectAdminCategories(id, counter, username){
   let array = [];
-  let userexpenses = [];
+  userexpenses = [];
   for(var i = 0; i < expenses.length; i++){
     if(id == expenses[i].User_ID)
     {
@@ -213,16 +211,16 @@ let arrayreduced = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0
 let filteredarray = Object.keys(arrayreduced).map(item => ({name: item, count: arrayreduced[item]}));
 
 for(var i = 0; i < filteredarray.length; i++){
-  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses(filteredarray[i].name, userexpenses, username) + "</div></div></li>";
+  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses(filteredarray[i].name, username) + "</div></div></li>";
 }
 }
 
-function injectAdminExpenses(name, userexpenses, username) {
+function injectAdminExpenses(name, username) {
   let rows = "";
   for(var i = 0; i < userexpenses.length; i++){
     if(userexpenses[i].Client_Project == name)
     {
-      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
+      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'"+ ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
     }
   }
     return "<table><thead><tr><th class='checkbox-cell'><label class='checkbox'><input type='checkbox' disabled><i class='icon-checkbox'></i></label></th><th class='label-cell'>Project Name:</th><th class='numeric-cell'>Report ID:</th><th class='numeric-cell'>Description:</th><th class='numeric-cell'>Category:</th><th class='numeric-cell'>Amount:</th><th class='numeric-cell'>Approve / Reject:</th></tr></thead><tbody>" + rows + "</tbody></table>";
@@ -307,7 +305,6 @@ function displayFormData(){
 
 function addExpenseReport(){
   let hasFetched = false;
-
   var formData = app.form.convertToData('#my-form');
   if(formData.desc != "" && formData.amount != ""){
   let newprojectid = fetch("https://stormy-coast-58891.herokuapp.com/maxprojectid/")
@@ -326,11 +323,30 @@ function addExpenseReport(){
   }
 }
 
+function removeExpenseReport(){
+  // Define expense id object for database deletion. 
+  let id = {id: expenses[selected_index].report_ID}
+  // If admin approves expense run this code.
+  if(bContinue){
+    // Copy the report into the archive table.
+    let archived = {userId: expenses[selected_index].User_ID, reportId: expenses[selected_index].report_ID, subdate: expenses[selected_index].Date_of_Submission, reciept: expenses[selected_index].Reciept, desc: expenses[selected_index].Expense_Desc, category: expenses[selected_index].Category, clientname: expenses[selected_index].Client_Name, clientproject: expenses[selected_index].Client_Project, bill: expenses[selected_index].Billable, paymeth: expenses[selected_index].Payment_Method, amount: expenses[selected_index].Amount}
+    app.request.postJSON('https://stormy-coast-58891.herokuapp.com/archiveexpense', archived);
+  }
+  // Remove the report from the report table in the database.
+  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deleteexpense', id);
+  // Remove expense from the front end.
+  expenses.splice(selected_index, 1);
+  // Reload the page to update the changes.
+  displayAdminExpenses();
+}
+
 function approveExpense(id, username, desc, category, amount){
   dynamicPopup.open();
   document.getElementById("alertmessage").innerHTML = '<h1 style="text-align: center">Approve Report #' + id + '</h1><h3 style="text-align: center">Are you sure you want to approve this expense report?</h3>';
   document.getElementById("name").value = username;
   document.getElementById("message").value = "Your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been approved! 😄👏";
+  updateIndex(expenses.findIndex(item => item.report_ID === id));
+  bContinue = true;
 }
 
 function rejectExpense(id, username, desc, category, amount){
@@ -338,6 +354,8 @@ function rejectExpense(id, username, desc, category, amount){
   document.getElementById("alertmessage").innerHTML = '<h1 style="text-align: center">Reject Report #' + id + '</h1><h3 style="text-align: center">Are you sure you want to reject this expense report?</h3>';
   document.getElementById("name").value = username;
   document.getElementById("message").value = "Sorry your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been rejected! 😭";
+  updateIndex(expenses.findIndex(item => item.report_ID === id));
+  bContinue = false;
 }
 
 function updateFormEmail(){
