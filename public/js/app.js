@@ -146,6 +146,32 @@ function loginOnKeyEnter(input1, input2, button){
   });
 }
 
+function onGoogleSignIn(googleUser) {
+  var profile = googleUser.getBasicProfile();
+  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+  console.log('Name: ' + profile.getName());
+  console.log('Image URL: ' + profile.getImageUrl());
+  console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+}
+
+function onFBSignin() {
+  FB.getLoginStatus(function(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+  // The response object is returned with a status field that lets the
+  // app know the current login status of the person.
+  // Full docs on the response object can be found in the documentation
+  // for FB.getLoginStatus().
+  if (response.status === 'connected') {
+    // Logged into your app and Facebook.
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+    });
+  }
+  });
+}
+
 function saveLogin(response){
   if(response[0].hasOwnProperty("User_Username")){
       logindata = response.map(item => ({name: item.User_Username, id: item.User_ID}));
