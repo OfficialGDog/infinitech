@@ -1,6 +1,7 @@
 const colors = ['green', 'purple', 'orange', 'red'];
 var userexpenses = [];
 var logindata = null;
+var sociallogindata = null;
 var expenses = null;
 var filteredCategories = null;
 var filteredProject = null;
@@ -62,6 +63,10 @@ if(page.name=='expenses'){
   }
 }
 else if(page.name=='categories'){
+    if(sociallogindata != null){
+      updateSideBar();
+    }
+
     filterPicker = app.picker.create({
     inputEl: '#filter',
     cols: [
@@ -111,10 +116,6 @@ else if(page.name == 'admin'){
   name: 'My App',
   // App id
   id: 'com.myapp.test',
-  // Enable swipe panel
-  panel: {
-    swipe: 'left',
-  },
   // Add default routes
   routes: routes
 
@@ -146,18 +147,31 @@ function loginOnKeyEnter(input1, input2, button){
   });
 }
 
+function updateSideBar(){
+    document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + sociallogindata.name + "</span><span class='drawer-email'>" + sociallogindata.email + "</span>";
+    document.getElementById("drawer-icon").src = sociallogindata.picture;
+}
+
 function onGoogleSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
+  sociallogindata = {name: profile.getName(), picture: profile.getImageUrl(), email: profile.getEmail()}
   console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  console.log('Name: ' + profile.getName());
-  console.log('Image URL: ' + profile.getImageUrl());
-  console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+  app.views.main.router.navigate('/categories/');
+}
+
+function onGoogleSignOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log('User signed out.');
+  });
 }
 
 function onFBSignin() {
   FB.getLoginStatus(function(response) {
+    let image_url = 'https://graph.facebook.com/' +  response.authResponse.userID + '/picture?type=normal';
     console.log('statusChangeCallback');
     console.log(response);
+    console.log('ID:' + response.authResponse.userID);
   // The response object is returned with a status field that lets the
   // app know the current login status of the person.
   // Full docs on the response object can be found in the documentation
@@ -167,6 +181,9 @@ function onFBSignin() {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
+      sociallogindata = {name: response.name, picture: image_url, email: ""}
+      console.log(sociallogindata);
+      app.views.main.router.navigate('/categories/');
     });
   }
   });

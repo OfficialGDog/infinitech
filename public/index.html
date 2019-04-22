@@ -27,8 +27,52 @@
 
 <body>
   <div id="app">
-    <div class="panel panel-left panel-reveal">
-         <h1>Hello world</h1>
+    <div class="panel panel-left panel-cover">
+         <!-- Navigation Drawer -->
+         <div class="layout-drawer is-open">
+            <div class="drawer-header drawer-header-cover">
+                <div class="drawer-user">
+                    <div style="position: absolute;left: 125px;top: 40px;"><button href="#" onclick="onGoogleSignOut();">Sign out</button></div>
+                    <div class="drawer-avatar">
+                        <img id="drawer-icon" src="assets/default.png">
+                    </div>
+                    <div id="drawer-meta" class="drawer-meta">
+                        <span class="drawer-name">Placeholder</span>
+                        <span class="drawer-email">placeholder@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="drawer-navigation drawer-border">
+                <a class="drawer-list-item is-active" href="javascript:">
+                  <i class="f7-icons material-icons">home</i><span class="">Home</span>
+                </a>
+                <a class="drawer-list-item" href="javascript:">
+                  <i class="f7-icons material-icons">add_round</i><span>Add Expense</span>
+                </a>
+                <a class="drawer-list-item" href="javascript:">
+                  <i class="f7-icons material-icons">help_round</i><span>Guidance Notes</span>
+                </a>
+                <a class="drawer-list-item" href="javascript:">
+                  <i class="f7-icons material-icons">person_round</i><span>Profile</span>
+                </a>
+            </nav>
+            <nav class="drawer-navigation drawer-border">
+                <span class="drawer-subtitle">Actions</span>
+                <div class="accordion-list custom-accordion">
+                  <div class="accordion-item" style="padding-left: 48px;padding-bottom: 10px;">
+                    <div class="accordion-item-toggle">
+                      <span class="">All Expenses</span></div>
+                      <div class="accordion-item-content" style="padding-top: 5px;margin-right: 6px;" aria-hidden="true"><a class="drawer-list-item" href="javascript:"><span class="">Rejected</span><i class="drawer-badge">12</i></a><a class="drawer-list-item" href="javascript:"><span class="">Pending</span><i class="drawer-badge">24</i></a><a class="drawer-list-item" href="javascript:"><span class="">Confirmed</span><i class="drawer-badge">6</i></a>
+                      </div>
+                    </div>
+                  </div>
+            </nav>
+            <nav class="drawer-navigation">
+                <a class="drawer-list-item" href="javascript:">
+                  <i class="f7-icons material-icons">settings_fill</i><span>Settings</span>
+                </a>
+            </nav>
+          </div>
     </div>
     <div class="statusbar"></div>
     <div class="view view-main">
@@ -79,11 +123,6 @@
           .catch(err => console.error(err))
 
           Promise.all([user,admin]).then(function(){if(isUser == null || isAdmin == null){app.dialog.alert("Unable to connect with server.­", "Connection timed out 🤔"); console.log("Connection to the server failed has failed! Error: 404")} else if(!isUser && !isAdmin){app.dialog.alert("Incorrect username and/or password. Please try again! 🔒­", "Login credentials incorrect!");}})
-      }
-
-      googleLogin = () =>{
-        document.getElementById("googlelogin").click();
-        console.log("clicked");
       }
       render(){
       return(

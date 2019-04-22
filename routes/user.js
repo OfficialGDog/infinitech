@@ -32,6 +32,34 @@ router.get("/admin_login", (req, res) => {
     })
 })
 
+router.get("/user_social_login", (req, res) => {
+    console.log("Searching user table with provided credentials...");
+    const {googleid, facebookid} = req.query;
+    const connection = getConnection()
+    const queryString = `SELECT * FROM user WHERE User_Google_ID = '${googleid}' or User_Facebook_ID = '${facebookid}'`
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Failed to query for users: " + err)
+            return res.sendStatus(500)
+        }
+        return res.json(rows)
+    })
+})
+
+router.get("/admin_social_login", (req, res) => {
+    console.log("Searching admin table with provided credentials...");
+    const {googleid, facebookid} = req.query;
+    const connection = getConnection()
+    const queryString = `SELECT * FROM admin WHERE Admin_Google_ID = '${googleid}' or Admin_Facebook_ID = '${facebookid}'`
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Failed to query for users: " + err)
+            return res.sendStatus(500)
+        }
+        return res.json(rows)
+    })
+})
+
 router.get("/expenses/:id", (req, res) => {
     console.log("Fetching expenses with id: " + req.params.id)
 
