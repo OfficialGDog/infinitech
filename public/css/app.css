@@ -5,11 +5,8 @@
   top: 0px;
   padding: 20px;
   color: white;
-  font-size: 5vmax;
-  margin-top: -10px;
-  font-weight: normal;
-  font-size: 5vmax;
   left: 0px;
+  width: 20vmax;
 }
 .container {
   border-radius: 5px;

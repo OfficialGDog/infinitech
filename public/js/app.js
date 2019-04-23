@@ -1,4 +1,5 @@
 const colors = ['green', 'purple', 'orange', 'red'];
+const error_message = "<img src='assets/error.jpg' style='object-fit: cover;display: block;margin-left: auto;margin-right: auto;'>";
 var userexpenses = [];
 var logindata = null;
 var sociallogindata = null;
@@ -9,11 +10,16 @@ var projectdata = null;
 var categorydata = null;
 var filterPicker = null;
 var selected_index = null;
+var bError = false;
 var bContinue = false;
 
 var app = new Framework7({
   picker: {
     toolbarCloseText: ""
+  },
+  swipeout: {
+    noFollow: true,
+    removeElements: false
   },
 on: {
   init: function () {
@@ -65,6 +71,9 @@ if(page.name=='expenses'){
 else if(page.name=='categories'){
     if(sociallogindata != null){
       updateSideBar();
+    }
+    else if(bError){
+      document.getElementsByClassName("page-content")[1].innerHTML = error_message;
     }
 
     filterPicker = app.picker.create({
@@ -163,6 +172,7 @@ function onGoogleSignOut() {
   var auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut().then(function () {
     console.log('User signed out.');
+    document.location.reload(true);
   });
 }
 
@@ -229,7 +239,7 @@ function fetchAdminExpenses(id){
   .then(response => {if(response.length > 0){projectdata = response.slice(0)} else{projectdata = false}})
   .catch(err => console.error(err), projectdata = false)
 
-  Promise.all([datapack1,datapack2]).then(function(){if(projectdata && expenses){displayAdminExpenses();}else{console.log("Failed to fetch data :(")}})
+  Promise.all([datapack1,datapack2]).then(function(){if(projectdata && expenses){displayAdminExpenses();}else{console.log("Failed to fetch data :("); document.getElementsByClassName("page-content")[1].innerHTML = error_message}})
 }
 
 
@@ -280,7 +290,7 @@ function injectAdminExpenses(name, username) {
 }
 
 function displayCategories(categories){
-  while(document.getElementById("categories").innerHTML != null){
+    while(document.getElementById("categories") != null) {
     document.getElementById("categories").innerHTML = "";
     if(categories.length > 0){
       for(var i = 0; i < categories.length; i++){
@@ -312,7 +322,7 @@ function fetchFormData(){
   .then(response => {if(response.length > 0) {categorydata = response.slice(0)} else{categorydata = false}})
   .catch(err => console.error(err), categorydata = false)
 
-  Promise.all([datapack1,datapack2]).then(function(){if(categorydata && projectdata){displayFormData()} else {console.error("Failed to fetch data :(")}})
+  Promise.all([datapack1,datapack2]).then(function(){if(categorydata && projectdata){displayFormData()} else {console.error("Failed to fetch data :("); document.getElementsByClassName("page-content")[1].innerHTML = error_message;}})
 }
 
 function displayFormData(){
@@ -421,4 +431,8 @@ function updateFormEmail(){
 function displayFormSuccess(){
   dynamicPopup.close();
   app.dialog.alert("Your email has been sent successfully! 😄", "Email was sent to user");
+}
+
+function displayError(){
+  bError = true;
 }
