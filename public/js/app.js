@@ -10,7 +10,6 @@ var projectdata = null;
 var categorydata = null;
 var filterPicker = null;
 var selected_index = null;
-var bError = false;
 var bContinue = false;
 
 var app = new Framework7({
@@ -60,9 +59,8 @@ if(page.name=='expenses'){
             subtitle = filteredExpenses[i].Category;
           break;
         }
-
         let randomcolor = colors[Math.floor(Math.random() * colors.length)];
-        document.getElementById("expenses").innerHTML += "<div class='card theme-" + randomcolor + "' style='margin-top: 50px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888; height: 100px;'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>" + filteredExpenses[i].Amount + "</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + title + "</h3><h4 class='card__greytext' style='font-weight: normal;margin: auto;margin-top: 15px;margin-bottom: 15px;'>" + filteredExpenses[i].Client_Name + ", " + subtitle + "</h4><p class='card__greytext' style='width: 80%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + filteredExpenses[i].Expense_Desc + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>Awaiting confirmation...</div></div></div></div></div>";
+        document.getElementById("expenses").innerHTML += "<div class='card theme-" + randomcolor + "' style='margin-top: 50px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888; height: 100px;'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>" + filteredExpenses[i].Amount + "</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + title + "</h3><h4 class='card__greytext' style='font-weight: normal;margin: auto;margin-top: 15px;margin-bottom: 15px;'>" + filteredExpenses[i].Client_Name + ", " + subtitle + "</h4><p class='card__greytext' style='width: 80%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + filteredExpenses[i].Expense_Desc + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>" + filteredExpenses[i].Status + "</div></div></div></div></div>";
       }
     }
     selected_index = null;
@@ -71,9 +69,8 @@ if(page.name=='expenses'){
 else if(page.name=='categories'){
     if(sociallogindata != null){
       updateSideBar();
-    }
-    else if(bError){
-      document.getElementsByClassName("page-content")[1].innerHTML = error_message;
+    } else if(logindata != null){
+      document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + logindata[0].name + "</span><span class='drawer-email'> ID: "  + logindata[0].id +  "</span>";
     }
 
     filterPicker = app.picker.create({
@@ -116,6 +113,9 @@ else if(page.name == 'addexpenses'){
 }
 else if(page.name == 'admin'){
   console.log("admin page loaded!");
+  if(logindata != null){
+    document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + logindata[0].name + "</span><span class='drawer-email'> ID: " + logindata[0].id + "</span>";
+  }
 }
 },
 },
@@ -214,7 +214,7 @@ function saveLogin(response){
 function fetchExpenses(id){
   fetch("https://stormy-coast-58891.herokuapp.com/expenses/" + id)
   .then(response => response.json())
-  .then(response => {expenses = response.slice(0); updateUserExpenses(); console.log(expenses)})
+  .then(response => {expenses = response.slice(0); updateUserExpenses();})
   .catch(err => console.error(err))
 }
 
@@ -431,8 +431,4 @@ function updateFormEmail(){
 function displayFormSuccess(){
   dynamicPopup.close();
   app.dialog.alert("Your email has been sent successfully! 😄", "Email was sent to user");
-}
-
-function displayError(){
-  bError = true;
 }
