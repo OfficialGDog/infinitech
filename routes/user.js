@@ -25,7 +25,21 @@ router.get("/admin_login", (req, res) => {
     const queryString = `SELECT * FROM admin WHERE Admin_Username = '${username}' and Admin_Password = '${password}'`
     connection.query(queryString, (err, rows, fields) => {
         if(err){
-            console.log("Failed to query for users: " + err)
+            console.log("Failed to query for admins: " + err)
+            return res.sendStatus(500)
+        }
+        return res.json(rows)
+    })
+})
+
+router.get("/manager_login", (req, res) => {
+    console.log("Logging in with manager credientials....");
+    const {username, password} = req.query;
+    const connection = getConnection()
+    const queryString = `SELECT * FROM manager WHERE Manager_Username = '${username}' and Manager_Password = '${password}'`
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Failed to query for managers: " + err)
             return res.sendStatus(500)
         }
         return res.json(rows)
@@ -36,7 +50,7 @@ router.get("/user_social_login", (req, res) => {
     console.log("Searching user table with provided credentials...");
     const {googleid, facebookid} = req.query;
     const connection = getConnection()
-    const queryString = `SELECT * FROM user WHERE User_Google_ID = '${googleid}' or User_Facebook_ID = '${facebookid}'`
+    const queryString = `SELECT User_ID, User_Username, User_Email FROM user WHERE User_Google_ID = '${googleid}' or User_Facebook_ID = '${facebookid}'`
     connection.query(queryString, (err, rows, fields) => {
         if(err){
             console.log("Failed to query for users: " + err)
@@ -50,7 +64,7 @@ router.get("/admin_social_login", (req, res) => {
     console.log("Searching admin table with provided credentials...");
     const {googleid, facebookid} = req.query;
     const connection = getConnection()
-    const queryString = `SELECT * FROM admin WHERE Admin_Google_ID = '${googleid}' or Admin_Facebook_ID = '${facebookid}'`
+    const queryString = `SELECT Admin_ID, Admin_Username, Admin_Email FROM admin WHERE Admin_Google_ID = '${googleid}' or Admin_Facebook_ID = '${facebookid}'`
     connection.query(queryString, (err, rows, fields) => {
         if(err){
             console.log("Failed to query for users: " + err)
@@ -88,7 +102,7 @@ router.post('/deleteexpense', urlencodedParser, function(req, res) {
             console.log("Failed to delete expense" + err)
             return res.sendStatus(500)
         }
-        console.log("Deleted expense report!")
+        console.log(results.affectedRows + " record(s) was deleted!");
         res.end()
     })
     res.end()
@@ -96,9 +110,7 @@ router.post('/deleteexpense', urlencodedParser, function(req, res) {
 
 router.get("/adminexpenses/:id", (req, res) => {
     console.log("Fetching admin expenses with id: " + req.params.id)
-
     const connection = getConnection()
-
     const userId = req.params.id
     const queryString = "SELECT Admin_ID, report.User_ID, report_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence FROM user, report WHERE user.User_ID = report.User_ID AND Admin_Id = ?"
     connection.query(queryString, [userId], (err, rows, fields) => {
@@ -106,7 +118,6 @@ router.get("/adminexpenses/:id", (req, res) => {
             console.log("Query failed:" + err)
             return res.sendStatus(500)
         }
-
         console.log("Fetched admin expenses successfully!")
         return res.json(rows)
     })
@@ -124,7 +135,38 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
             console.log("Failed to insert new expense:" + err)
             return res.sendStatus(500)
         }
-        console.log("Inserted a new expense")
+        console.log(results.affectedRows + " record(s) was added!");
+        res.end()
+    })
+    res.end()
+  })
+
+  router.post('/addcategory', urlencodedParser, function(req, res) {
+    console.log("Trying to add a new category...")
+    const queryString = "INSERT INTO category VALUES (?)"
+  
+    getConnection().query(queryString, [req.body.category], function (err, results, fields) {
+        if(err) {
+            console.log("Failed to insert a new category:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record(s) was added!");
+        res.end()
+    })
+    res.end()
+  })
+
+  router.post('/addproject', urlencodedParser, function(req, res) {
+    console.log("Trying to add a new project...")
+    var params = [req.body.projectid, req.body.projectname, req.body.clientname];
+    const queryString = "INSERT INTO project (Project_ID, Project_Name, Client_Name) VALUES (?,?,?)"
+  
+    getConnection().query(queryString, params, function (err, results, fields) {
+        if(err) {
+            console.log("Failed to insert a new project:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record(s) was added!");
         res.end()
     })
     res.end()
@@ -141,7 +183,7 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
             console.log("Failed to move expense into archive table:" + err)
             return res.sendStatus(500)
         }
-        console.log("Expense was successfully inserted into archive table.")
+        console.log(results.affectedRows + " record moved into archive table.");
         res.end()
     })
     res.end()

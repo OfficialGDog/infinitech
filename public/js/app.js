@@ -2,7 +2,6 @@ const colors = ['green', 'purple', 'orange', 'red'];
 const error_message = "<img src='assets/error.jpg' style='object-fit: cover;display: block;margin-left: auto;margin-right: auto;'>";
 var userexpenses = [];
 var logindata = null;
-var sociallogindata = null;
 var expenses = null;
 var filteredCategories = null;
 var filteredProject = null;
@@ -67,12 +66,8 @@ if(page.name=='expenses'){
   }
 }
 else if(page.name=='categories'){
-    if(sociallogindata != null){
-      updateSideBar();
-    } else if(logindata != null){
-      document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + logindata[0].name + "</span><span class='drawer-email'> ID: "  + logindata[0].id +  "</span>";
-    }
-
+    updateStatusBar();
+    fetchExpenses(logindata[0].id);
     filterPicker = app.picker.create({
     inputEl: '#filter',
     cols: [
@@ -112,10 +107,9 @@ else if(page.name == 'addexpenses'){
     }
 }
 else if(page.name == 'admin'){
+  updateStatusBar();
+  fetchAdminExpenses(logindata[0].id);
   console.log("admin page loaded!");
-  if(logindata != null){
-    document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + logindata[0].name + "</span><span class='drawer-email'> ID: " + logindata[0].id + "</span>";
-  }
 }
 },
 },
@@ -156,16 +150,10 @@ function loginOnKeyEnter(input1, input2, button){
   });
 }
 
-function updateSideBar(){
-    document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + sociallogindata.name + "</span><span class='drawer-email'>" + sociallogindata.email + "</span>";
-    document.getElementById("drawer-icon").src = sociallogindata.picture;
-}
-
 function onGoogleSignIn(googleUser) {
   var profile = googleUser.getBasicProfile();
-  sociallogindata = {name: profile.getName(), picture: profile.getImageUrl(), email: profile.getEmail()}
-  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  app.views.main.router.navigate('/categories/');
+  saveLogin([{name: profile.getName(), email: profile.getEmail(), picture: profile.getImageUrl(), id: profile.getId()}]);
+  validateSocialMediaLogin(logindata[0].id, null);
 }
 
 function onGoogleSignOut() {
@@ -179,9 +167,7 @@ function onGoogleSignOut() {
 function onFBSignin() {
   FB.getLoginStatus(function(response) {
     let image_url = 'https://graph.facebook.com/' +  response.authResponse.userID + '/picture?type=normal';
-    console.log('statusChangeCallback');
-    console.log(response);
-    console.log('ID:' + response.authResponse.userID);
+    let id = response.authResponse.userID;
   // The response object is returned with a status field that lets the
   // app know the current login status of the person.
   // Full docs on the response object can be found in the documentation
@@ -191,9 +177,8 @@ function onFBSignin() {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
-      sociallogindata = {name: response.name, picture: image_url, email: ""}
-      console.log(sociallogindata);
-      app.views.main.router.navigate('/categories/');
+      saveLogin([{name: response.name, picture: image_url, email: "", id: id}]);
+      validateSocialMediaLogin(null, logindata[0].id);
     });
   }
   });
@@ -201,17 +186,38 @@ function onFBSignin() {
 
 function saveLogin(response){
   if(response[0].hasOwnProperty("User_Username")){
-      logindata = response.map(item => ({name: item.User_Username, id: item.User_ID}));
+      logindata = response.map(item => ({name: item.User_Username, email: item.User_Email, id: item.User_ID}));
   }
   else if(response[0].hasOwnProperty("Admin_Username")){
-      logindata = response.map(item => ({name: item.Admin_Username, id: item.Admin_ID}));
+      logindata = response.map(item => ({name: item.Admin_Username, email: item.Admin_Email, id: item.Admin_ID}));
   }
-  else{
+  else if(response[0].hasOwnProperty("name")){
+      logindata = response.map(item => ({name: item.name, email: item.email, id: item.id, picture: item.picture}));
+  }
+  else {
     console.error("Failed to save login information!");
   }
 }
 
+function validateSocialMediaLogin(googleid, facebookid){
+  let isUser = null;
+  let isAdmin = null;
+
+  let user = fetch(`https://stormy-coast-58891.herokuapp.com/user_social_login?googleid=${googleid}&facebookid=${facebookid}`)
+  .then(response => response.json())
+  .then(response => {console.log(response); if(response.length == 0) {isUser = false;} else if(response.length == 1){logindata[0].id = response[0].User_ID; logindata[0].name = response[0].User_Username; logindata[0].email = response[0].User_Email; app.views.main.router.navigate('/categories/'); isUser = true;}})
+  .catch(err => console.error(err))
+
+  let admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_social_login?googleid=${googleid}&facebookid=${facebookid}`)
+  .then(response => response.json())
+  .then(response => {console.log(response); if(response.length == 0) {isAdmin = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); isAdmin = true;}})
+  .catch(err => console.error(err))
+
+  Promise.all([user,admin]).then(function(){if(isUser == null || isAdmin == null){app.dialog.alert("There are too many users are associated with that account, please contact ­the system administrator.", "Too many users registered!");} else if(!isUser && !isAdmin){app.dialog.alert("Sorry we couldn't find an account with the login you provided to us.­ 🤷", "User account not found! 😲");}})
+}
+
 function fetchExpenses(id){
+  console.log(id);
   fetch("https://stormy-coast-58891.herokuapp.com/expenses/" + id)
   .then(response => response.json())
   .then(response => {expenses = response.slice(0); updateUserExpenses();})
@@ -229,6 +235,7 @@ function updateUserExpenses(){
 }
 
 function fetchAdminExpenses(id){
+  console.log(id);
   let datapack1 = fetch("https://stormy-coast-58891.herokuapp.com/adminexpenses/" + id)
   .then(response => response.json())
   .then(response => {if(response.length > 0) {expenses = response.slice(0);} else {expenses = false}})
@@ -290,6 +297,7 @@ function injectAdminExpenses(name, username) {
 }
 
 function displayCategories(categories){
+  console.log(categories);
     while(document.getElementById("categories") != null) {
     document.getElementById("categories").innerHTML = "";
     if(categories.length > 0){
@@ -431,4 +439,11 @@ function updateFormEmail(){
 function displayFormSuccess(){
   dynamicPopup.close();
   app.dialog.alert("Your email has been sent successfully! 😄", "Email was sent to user");
+}
+
+function updateStatusBar() {
+  if(logindata != null) {
+    document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + logindata[0].name + "</span><span class='drawer-email'>" + logindata[0].email +"</span>";
+    if(logindata[0].hasOwnProperty("picture")){document.getElementById("drawer-icon").src = logindata[0].picture}
+  } else {console.log("Failed to update status bar :(")}
 }
