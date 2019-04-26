@@ -125,7 +125,7 @@
 
           let manager = fetch(`https://stormy-coast-58891.herokuapp.com/manager_login?username=${this.state.username}&password=${this.state.password}`)
           .then(response => response.json())
-          .then(response => {if(response.length == 1){isManager = true; app.dialog.alert("Manager login detected", "Success! 😄👏"); } else if(response.length == 0){isManager = false;}})
+          .then(response => {if(response.length == 1){isManager = true; app.views.main.router.navigate('/manager/'); } else if(response.length == 0){isManager = false;}})
           .catch(err => console.error(err))
 
           Promise.all([user,admin, manager]).then(function(){if(isUser == null || isAdmin == null || isManager == null){app.dialog.alert("Unable to connect with server.­", "Connection timed out 🤔"); console.log("Connection to the server failed has failed! Error: 404")} else if(!isUser && !isAdmin && !isManager){app.dialog.alert("Incorrect username and/or password. Please try again! 🔒­", "Login credentials incorrect!");}})

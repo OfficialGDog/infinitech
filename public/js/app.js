@@ -9,6 +9,7 @@ var projectdata = null;
 var categorydata = null;
 var filterPicker = null;
 var selected_index = null;
+var user_emails = null;
 var bContinue = false;
 
 var app = new Framework7({
@@ -111,6 +112,10 @@ else if(page.name == 'admin'){
   fetchAdminExpenses(logindata[0].id);
   console.log("admin page loaded!");
 }
+else if(page.name == 'manager'){
+  fetchUserEmails();
+  console.log("manager page loaded!");
+}
 },
 },
   // App root element
@@ -125,13 +130,34 @@ else if(page.name == 'admin'){
 });
 
 var dynamicPopup = app.popup.create({
-  content: '<div class="popup"><div class="block" style="height:100%"><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess();' + 'removeExpenseReport()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="subject" name="subject" placeholder="Subject" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input item-input-with-value" style="display: none"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="others" name="others" placeholder="cc" class="input-with-value"><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
+  content: '<div class="popup"><div class="block" style="height:100%"><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess();' + 'removeExpenseReport()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="subject" name="subject" placeholder="Subject" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input item-input-with-value" style="display: none"><div class="item-inner"><div class="item-input-wrap"><textarea id="others" name="others" placeholder="cc" class="input-with-value"></textarea><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
   on: {
     opened: function (popup) {
       loaded();
     },
   }
 });
+
+var ac1 = app.actions.create({
+  buttons: [
+    {
+      text: 'Issue Reminder Messages',
+      onClick: function () {
+        dynamicPopup.open();
+        document.getElementById("alertmessage").innerHTML = '<div class="list inset"><ul><li class="item-content item-input item-input-with-value"><div class="item-inner"><div class="item-title item-label">Message Type:</div><div class="item-input-wrap input-dropdown-wrap"><select onchange="fillFormData(this.value)" placeholder="Please choose..." class="input-with-value"><option value="incomplete">Incomplete Expenses Submission</option><option value="reminder">Payroll Deadline Reminder</option></select></div></div></li></ul></div>';
+        document.getElementById("myForm").nextSibling.innerHTML= '<h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to all users.</h4>';
+        document.getElementById("myForm").setAttribute("onsubmit", "displayFormSuccess()");
+        document.getElementsByClassName("form-elements")[0].childNodes[3].style = "display: none";
+        document.getElementsByClassName("form-elements")[0].childNodes[4].style = "display: block";
+        if(user_emails) {for (var i = 0; i < user_emails.length; i++){if(i == 0){document.getElementById("email").value = user_emails[0].user_email;} else if(i == (user_emails.length) - 1){document.getElementById("others").value += user_emails[i].user_email} else{document.getElementById("others").value += user_emails[i].user_email + ","; } } updateFormEmail();}
+      }
+    },
+    {
+      text: 'Cancel',
+      color: 'red'
+    },
+  ]
+})
 
 var mainView = app.views.create('.view-main');
 
@@ -448,4 +474,40 @@ function updateStatusBar() {
     document.getElementById("drawer-meta").innerHTML = "<span class='drawer-name'>" + logindata[0].name + "</span><span class='drawer-email'>" + logindata[0].email +"</span>";
     if(logindata[0].hasOwnProperty("picture")){document.getElementById("drawer-icon").src = logindata[0].picture}
   } else {console.log("Failed to update status bar :(")}
+}
+
+function fillFormData(x){
+  switch(x){
+    case "reminder":
+    document.getElementById("subject").value = "Payroll Deadline Reminder";
+    document.getElementById("message").value = "This email is to remind all employees that the payroll deadline is ... for expense claim submissions.";
+    break;
+    case "incomplete":
+    document.getElementById("subject").value = "Incomplete Expense Submission Received";
+    document.getElementById("message").value = "We have recently received your expenses claim submission. Unfortunately, some of the information required is missing. Please check your submission and complete in full. Incomplete submissions will not be approved.";
+    break;
+  }
+}
+
+function displayTimeline(x){
+  if(x == "true"){
+    document.getElementsByClassName("timeline tablet-sides")[0].style = "display: block";
+    document.getElementById("page1").style = "display: none";
+    document.getElementsByClassName("button button-round")[2].classList.add("button-active");
+    let old = document.getElementsByClassName("button button-round")[0]; 
+    old.className = old.className.replace(" button-active", "");
+  } else{
+  document.getElementsByClassName("timeline tablet-sides")[0].style = "display: none";
+  document.getElementById("page1").style = "display: block";
+  document.getElementsByClassName("button button-round")[0].classList.add("button-active");
+  let old = document.getElementsByClassName("button button-round")[2]; 
+    old.className = old.className.replace(" button-active", "");
+  }
+}
+
+function fetchUserEmails(){
+  fetch("https://stormy-coast-58891.herokuapp.com/users/")
+  .then(response => response.json())
+  .then(response => {if(response.length > 0){user_emails = response.slice(0)} else{user_emails = false}})
+  .catch(err => console.error(err), user_emails = false)
 }

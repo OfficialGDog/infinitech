@@ -19,4 +19,8 @@ routes = [
       path: '/admin/',
       url: './admin.html',
     },
+    {
+      path: '/manager/',
+      url: './manager.html',
+    }
   ];

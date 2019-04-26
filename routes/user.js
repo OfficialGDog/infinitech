@@ -204,7 +204,7 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
 
 router.get("/users/", (req, res) => {
     const connection = getConnection()
-    const queryString = "SELECT user_username, user_id FROM user"
+    const queryString = "SELECT user_username, user_id, user_email FROM user"
     connection.query(queryString, (err, rows, fields) => {
         if(err){
             console.log("Query failed:" + err)
