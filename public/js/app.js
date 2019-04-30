@@ -149,7 +149,9 @@ var ac1 = app.actions.create({
         document.getElementById("myForm").setAttribute("onsubmit", "displayFormSuccess()");
         document.getElementsByClassName("form-elements")[0].childNodes[3].style = "display: none";
         document.getElementsByClassName("form-elements")[0].childNodes[4].style = "display: block";
-        if(user_emails) {for (var i = 0; i < user_emails.length; i++){if(i == 0){document.getElementById("email").value = user_emails[0].user_email;} else if(i == (user_emails.length) - 1){document.getElementById("others").value += user_emails[i].user_email} else{document.getElementById("others").value += user_emails[i].user_email + ","; } } updateFormEmail();}
+        let emails = "";
+        if(user_emails) {for (var i = 0; i < user_emails.length; i++){if(user_emails[i].user_email != null){ if(i == 0){document.getElementById("email").value = user_emails[0].user_email;} else if(i == (user_emails.length) - 1){emails += user_emails[i].user_email} else {emails += user_emails[i].user_email + ","; } } } updateFormEmail();}
+        document.getElementById("others").value = emails.substring(0, (emails.length - 1));
       }
     },
     {
