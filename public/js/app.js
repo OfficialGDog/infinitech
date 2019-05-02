@@ -107,17 +107,34 @@ else if(page.name == 'addexpenses'){
     displayFormData();
   }
 
+  // Preview Image
+  window.preview = function (input) {
+    if (input.files && input.files[0]) {
+      $("#previewImg").empty();
+        $(input.files).each(function () {
+            var reader = new FileReader();
+            reader.readAsDataURL(this);
+            reader.onload = function (e) {
+                $("#previewImg").append("<img src='" + e.target.result + "' style='width:150px;padding:15px'>");
+            }
+        });
+    }
+}
+
   // Handle Image Upload Here...
   $('#uploadForm').submit(function() {
           
     var $fileUpload = $("input[type='file']");
              if (parseInt($fileUpload.get(0).files.length) > 3){
-                app.dialog.alert("You can only upload a maximum of 3 images!");
+                app.dialog.alert("You can only upload a maximum of 3 images!", "InfiniTech 👊");
              }
              else {
+              app.preloader.show();
               $(this).ajaxSubmit({
               error: function(xhr) {
+              app.preloader.hide();
               console.error('Error: ' + xhr.status);
+              app.dialog.alert("Uh oh! Something went terribly wrong!! please try again later.", "Sorry 😭😭");
               },
               success: function(response) {
               addExpenseReport();
@@ -181,7 +198,16 @@ var ac1 = app.actions.create({
       color: 'red'
     },
   ]
-})
+});
+
+var photobrowse = app.photoBrowser.create({
+  photos : [
+      'https://cdn.framework7.io/placeholder/sports-1024x1024-1.jpg',
+      'https://cdn.framework7.io/placeholder/sports-1024x1024-2.jpg',
+      'https://cdn.framework7.io/placeholder/sports-1024x1024-3.jpg',
+  ],
+  routableModals: false
+});
 
 var mainView = app.views.create('.view-main');
 
@@ -340,10 +366,10 @@ function injectAdminExpenses(name, username) {
   for(var i = 0; i < userexpenses.length; i++){
     if(userexpenses[i].Client_Project == name)
     {
-      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'"+ ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
+      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='numeric-cell' data-collapsible-title='Evidence:'>" + displayEvidence(userexpenses[i].Evidence) + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'"+ ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
     }
   }
-    return "<table><thead><tr><th class='checkbox-cell'><label class='checkbox'><input type='checkbox' disabled><i class='icon-checkbox'></i></label></th><th class='label-cell'>Project Name:</th><th class='numeric-cell'>Report ID:</th><th class='numeric-cell'>Description:</th><th class='numeric-cell'>Category:</th><th class='numeric-cell'>Amount:</th><th class='numeric-cell'>Approve / Reject:</th></tr></thead><tbody>" + rows + "</tbody></table>";
+    return "<table><thead><tr><th class='checkbox-cell'><label class='checkbox'><input type='checkbox' disabled><i class='icon-checkbox'></i></label></th><th class='label-cell'>Project Name:</th><th class='numeric-cell'>Report ID:</th><th class='numeric-cell'>Description:</th><th class='numeric-cell'>Category:</th><th class='numeric-cell'>Amount:</th><th class='numeric-cell'>Evidence:</th><th class='numeric-cell'>Approve / Reject:</th></tr></thead><tbody>" + rows + "</tbody></table>";
 }
 
 function displayCategories(categories){
@@ -438,6 +464,7 @@ function addExpenseReport(){
   app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addexpense', formData); 
   if(bContinue) {filterPicker.setValue([filterPicker.cols[0].values[0]]);}
   // Update the front end
+  app.preloader.hide();
   let newobject = {User_ID: formData.userId, Report_ID: formData.reportId, Date_of_Submission: formData.subdate, Reciept: formData.reciept, Expense_Desc: formData.desc, Category: formData.category, Client_Name: formData.clientname, Client_Project: formData.clientproject, Billable: formData.bill, Payment_Method: formData.paymeth, Amount: formData.amount};
   expenses.push(newobject);
   updateUserExpenses();
@@ -534,4 +561,18 @@ function fetchUserEmails(){
   .then(response => response.json())
   .then(response => {if(response.length > 0){user_emails = response.slice(0)} else{user_emails = false}})
   .catch(err => console.error(err), user_emails = false)
+}
+
+function displayEvidence(string){
+  if(string != null){
+    let images = string.split(',');
+    return "<a onclick=" + "displayPhotos(" + "'" + escape(images.join(" ").toString()) + "'" + ")" + "><img style='width:30px;height:30px' src='/uploads/"  + images[0] + "'></img></a>"
+  } else {return false}
+}
+
+function displayPhotos(string){
+  let raw_data = unescape(string);
+  let photos = raw_data.split(" ");
+  photobrowse.params.photos = photos.map(photo => '/uploads/' + photo);
+  photobrowse.open();
 }

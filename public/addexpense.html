@@ -137,7 +137,7 @@
                                     <div class="item-inner">
                                         <div class="item-title item-label">Amount (£): </div>
                                         <div class="item-input-wrap">
-                                            <input name="amount" type="number" required>
+                                            <input name="amount" type="number">
                                           </div>
                                     </div>
                                   </li>
@@ -148,7 +148,8 @@
                                       <div class="item-inner">
                                           <div class="item-title item-label">Evidence: </div>
                                           <div class="item-input-wrap">
-                                            <input type="file" name="myImage" accept="image/jpg, image/jpeg, image/png" multiple required/>
+                                            <input type="file" name="myImage" accept="image/jpg, image/jpeg, image/png" onchange="preview(this)" multiple required/>
+                                            <div id='previewImg' class="block"></div>
                                             </div>
                                       </div>
                                     </li>
