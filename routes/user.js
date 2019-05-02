@@ -3,6 +3,56 @@ const mysql = require('mysql')
 const router = express.Router()
 const bodyParser = require('body-parser')
 var urlencodedParser = bodyParser.urlencoded({extended: false});
+const multer = require('multer');
+const path = require('path');
+var names = "";
+
+// Set The Storage Engine
+const storage = multer.diskStorage({
+  destination: './public/uploads/',
+  filename: function(req, file, cb){
+    cb(null,file.fieldname + '-' + Date.now() + Math.floor((Math.random() * 10) + 1) + path.extname(file.originalname));
+  }
+});
+
+// Init Upload
+const upload = multer({
+  storage: storage,
+  limits:{fileSize: 1000000},
+  fileFilter: function(req, file, cb){
+    checkFileType(file, cb);
+  }
+}).array('myImage',4); // 4 is the maximum number of photos to be uploaded.
+
+// Check File Type
+function checkFileType(file, cb){
+  // Allowed ext
+  const filetypes = /jpeg|jpg|png/;
+  // Check ext
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // Check mime
+  const mimetype = filetypes.test(file.mimetype);
+
+  if(mimetype && extname){
+    return cb(null,true);
+  } else {
+    cb('Error: Images Only!');
+  }
+}
+
+router.post('/upload', (req, res) => {
+    upload(req, res, (err) => {
+    console.log(req.files)
+      if(err){
+        res.end();
+      } else {
+        for(var i = 0; i < req.files.length; i++){
+            if(req.files[i] != null) {names += req.files[i].filename + ","}
+          }
+        return res.json(req.files);
+      }
+    });
+  });
 
 router.get("/user_login", (req, res) => {
     console.log("Logging in with user credientials....");
@@ -125,17 +175,20 @@ router.get("/adminexpenses/:id", (req, res) => {
 
 router.post('/addexpense', urlencodedParser, function(req, res) {
     console.log("Trying to add a new expense...")
-    console.log(req.body);
-	var params = [req.body.userId,req.body.reportId,req.body.subdate,req.body.reciept,req.body.desc,req.body.category,req.body.clientname,req.body.clientproject,req.body.bill,req.body.paymeth,req.body.amount];
+    let evidence = null;
+    if(names != "") {evidence = names.substring(0, (names.length - 1))}
+	var params = [req.body.userId,req.body.reportId,req.body.subdate,req.body.reciept,req.body.desc,req.body.category,req.body.clientname,req.body.clientproject,req.body.bill,req.body.paymeth,req.body.amount, evidence];
   
-    const queryString = "INSERT INTO report (User_ID, Report_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+    const queryString = "INSERT INTO report (User_ID, Report_ID, Date_of_Submission, Reciept, Expense_Desc, Category, Client_Name, Client_Project, Billable, Payment_Method, Amount, Evidence) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
   
     getConnection().query(queryString, params, function (err, results, fields) {
         if(err) {
             console.log("Failed to insert new expense:" + err)
+            names = "";
             return res.sendStatus(500)
         }
         console.log(results.affectedRows + " record(s) was added!");
+        names = "";
         res.end()
     })
     res.end()

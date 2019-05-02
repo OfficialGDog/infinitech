@@ -100,12 +100,34 @@ else if(page.name=='categories'){
 });
 }
 else if(page.name == 'addexpenses'){
-    if(projectdata == null || categorydata == null){
-      fetchFormData();
-    }
-    else{
-      displayFormData();
-    }
+  if(projectdata == null || categorydata == null){
+     fetchFormData();
+   }
+   else{
+    displayFormData();
+  }
+
+  // Handle Image Upload Here...
+  $('#uploadForm').submit(function() {
+          
+    var $fileUpload = $("input[type='file']");
+             if (parseInt($fileUpload.get(0).files.length) > 3){
+                app.dialog.alert("You can only upload a maximum of 3 images!");
+             }
+             else {
+              $(this).ajaxSubmit({
+              error: function(xhr) {
+              console.error('Error: ' + xhr.status);
+              },
+              success: function(response) {
+              addExpenseReport();
+              console.log(response);
+              }
+              });
+             }
+
+return false;
+  }); 
 }
 else if(page.name == 'admin'){
   updateStatusBar();
@@ -404,7 +426,7 @@ function displayFormData(){
 
 function addExpenseReport(){
   let hasFetched = false;
-  var formData = app.form.convertToData('#my-form');
+  var formData = app.form.convertToData('#uploadForm');
   if(formData.desc != "" && formData.amount != ""){
   let newprojectid = fetch("https://stormy-coast-58891.herokuapp.com/maxprojectid/")
   .then(response => response.json())

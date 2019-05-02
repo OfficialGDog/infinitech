@@ -16,6 +16,10 @@ routes = [
       url: './addexpense.html',
     },
     {
+      path: '/guidance_notes/',
+      url: './guidancenotes.html',
+    },
+    {
       path: '/admin/',
       url: './admin.html',
     },
