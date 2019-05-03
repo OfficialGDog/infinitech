@@ -60,7 +60,7 @@ if(page.name=='expenses'){
           break;
         }
         let randomcolor = colors[Math.floor(Math.random() * colors.length)];
-        document.getElementById("expenses").innerHTML += "<div class='card theme-" + randomcolor + "' style='margin-top: 50px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888; height: 100px;'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>" + filteredExpenses[i].Amount + "</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + title + "</h3><h4 class='card__greytext' style='font-weight: normal;margin: auto;margin-top: 15px;margin-bottom: 15px;'>" + filteredExpenses[i].Client_Name + ", " + subtitle + "</h4><p class='card__greytext' style='width: 80%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + filteredExpenses[i].Expense_Desc + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>" + filteredExpenses[i].Status + "</div></div></div></div></div>";
+        document.getElementById("expenses").innerHTML += "<a href='#' onclick='updateExpense(" + filteredExpenses[i].Report_ID + ")'><div class='card theme-" + randomcolor + "' style='margin-top: 50px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888; height: 100px;'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>" + filteredExpenses[i].Amount + "</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + title + "</h3><h4 class='card__greytext' style='font-weight: normal;margin: auto;margin-top: 15px;margin-bottom: 15px;'>" + filteredExpenses[i].Client_Name + ", " + subtitle + "</h4><p class='card__greytext' style='width: 80%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + filteredExpenses[i].Expense_Desc + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>" + filteredExpenses[i].Status + "</div></div></div></div></div></a>";
       }
     }
     selected_index = null;
@@ -98,6 +98,7 @@ else if(page.name=='categories'){
     }
   },
 });
+app.preloader.hide();
 }
 else if(page.name == 'addexpenses'){
   if(projectdata == null || categorydata == null){
@@ -149,10 +150,14 @@ return false;
 else if(page.name == 'admin'){
   updateStatusBar();
   fetchAdminExpenses(logindata[0].id);
+  document.getElementsByClassName("drawer-list-item")[0].href = "/admin/";
+  app.preloader.hide();
   console.log("admin page loaded!");
 }
 else if(page.name == 'manager'){
   fetchUserEmails();
+  document.getElementsByClassName("drawer-list-item")[0].href = "/manager/";
+  app.preloader.hide();
   console.log("manager page loaded!");
 }
 },
@@ -201,11 +206,7 @@ var ac1 = app.actions.create({
 });
 
 var photobrowse = app.photoBrowser.create({
-  photos : [
-      'https://cdn.framework7.io/placeholder/sports-1024x1024-1.jpg',
-      'https://cdn.framework7.io/placeholder/sports-1024x1024-2.jpg',
-      'https://cdn.framework7.io/placeholder/sports-1024x1024-3.jpg',
-  ],
+  photos : [],
   routableModals: false
 });
 
@@ -267,6 +268,9 @@ function saveLogin(response){
   else if(response[0].hasOwnProperty("Admin_Username")){
       logindata = response.map(item => ({name: item.Admin_Username, email: item.Admin_Email, id: item.Admin_ID}));
   }
+  else if(response[0].hasOwnProperty("Manager_Username")){
+    logindata = response.map(item => ({name: item.Manager_Username, email: item.Manager_Email, id: item.Manager_ID}));
+  }
   else if(response[0].hasOwnProperty("name")){
       logindata = response.map(item => ({name: item.name, email: item.email, id: item.id, picture: item.picture}));
   }
@@ -293,7 +297,6 @@ function validateSocialMediaLogin(googleid, facebookid){
 }
 
 function fetchExpenses(id){
-  console.log(id);
   fetch("https://stormy-coast-58891.herokuapp.com/expenses/" + id)
   .then(response => response.json())
   .then(response => {expenses = response.slice(0); updateUserExpenses();})
@@ -311,7 +314,6 @@ function updateUserExpenses(){
 }
 
 function fetchAdminExpenses(id){
-  console.log(id);
   let datapack1 = fetch("https://stormy-coast-58891.herokuapp.com/adminexpenses/" + id)
   .then(response => response.json())
   .then(response => {if(response.length > 0) {expenses = response.slice(0);} else {expenses = false}})
@@ -331,19 +333,19 @@ function displayAdminExpenses(){
   let position = 0;
   for(var i = 0; i < expenses.length; i++){
     let Old_UserID = null;
-    if(i > 0){Old_UserID = expenses[(i - 1)].User_ID;} else {const index = projectdata.map(e => e.user_id).indexOf(expenses[0].User_ID); document.getElementById("expenselist").innerHTML = "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user0" + "></ul></div></div></div></div>"; injectAdminCategories(expenses[0].User_ID, 0, projectdata[index].user_username);}
+    if(i > 0){Old_UserID = expenses[(i - 1)].User_ID;} else {const index = projectdata.map(e => e.user_id).indexOf(expenses[0].User_ID); document.getElementById("expenselist").innerHTML = "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user0" + "></ul></div></div></div></div>"; injectAdminCategories(expenses[0].User_ID, 0, projectdata[index].user_username, projectdata[index].user_email);}
     let Current_UserID = expenses[i].User_ID;
 
     if(Old_UserID != Current_UserID && Old_UserID != null){
     const index = projectdata.map(e => e.user_id).indexOf(expenses[i].User_ID);
     counter++;
     position += 60;
-    document.getElementById("expenselist").innerHTML += "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent; top: -" + position + "px'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user" + counter + "></ul></div></div></div></div>"; injectAdminCategories(expenses[i].User_ID, counter, projectdata[index].user_username);
+    document.getElementById("expenselist").innerHTML += "<div class='block block-strong no-hairlines tablet-inset' style='background: transparent; top: -" + position + "px'><div class='card data-table data-table-collapsible data-table-init' style='height: auto'><div class='card-header'><div class='data-table-header'><div class='data-table-title'>" + projectdata[index].user_username + "</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>sort</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div><div class='data-table-header-selected'><div class='data-table-title-selected'><span class='data-table-selected-count'>0</span> items selected</div><div class='data-table-actions'><a class='link icon-only'><i class='icon f7-icons if-not-md'>trash</i></a><a class='link icon-only'><i class='icon f7-icons if-not-md'>more_vertical_round</i></a></div></div></div><div class='card-content'><div class='list'><ul id=" + "user" + counter + "></ul></div></div></div></div>"; injectAdminCategories(expenses[i].User_ID, counter, projectdata[index].user_username, projectdata[index].user_email);
     }
   }
 }
 
-function injectAdminCategories(id, counter, username){
+function injectAdminCategories(id, counter, username, email){
   let array = [];
   userexpenses = [];
   for(var i = 0; i < expenses.length; i++){
@@ -356,24 +358,27 @@ function injectAdminCategories(id, counter, username){
 let arrayreduced = array.reduce(function(prev, cur) {prev[cur] = (prev[cur] || 0) + 1; return prev;}, {});
 let filteredarray = Object.keys(arrayreduced).map(item => ({name: item, count: arrayreduced[item]}));
 
+if(email == null){
+  email = "";
+}
+
 for(var i = 0; i < filteredarray.length; i++){
-  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses(filteredarray[i].name, username) + "</div></div></li>";
+  document.getElementById("user" + counter).innerHTML += "<li class='accordion-item'><a href='#' class='item-content item-link'><div class='item-inner'><div class='item-title'>" + filteredarray[i].name + " (" + filteredarray[i].count + ")" + "</div></div></a><div class='accordion-item-content' aria-hidden='true'><div class='block'>" + injectAdminExpenses(filteredarray[i].name, username, email) + "</div></div></li>";
 }
 }
 
-function injectAdminExpenses(name, username) {
+function injectAdminExpenses(name, username, email) {
   let rows = "";
   for(var i = 0; i < userexpenses.length; i++){
     if(userexpenses[i].Client_Project == name)
     {
-      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='numeric-cell' data-collapsible-title='Evidence:'>" + displayEvidence(userexpenses[i].Evidence) + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'"+ ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
+      rows += "<tr><td class='checkbox-cell'><label class='checkbox'><input type='checkbox'><i class='icon-checkbox'></i></label></td><td class='label-cell' data-collapsible-title='Project Name:'>" + userexpenses[i].Client_Project + "</td><td class='numeric-cell' data-collapsible-title='Report ID:'>" + userexpenses[i].report_ID + "</td><td class='numeric-cell' data-collapsible-title='Description:'>" + userexpenses[i].Expense_Desc + "</td><td class='numeric-cell' data-collapsible-title='Category:'>" + userexpenses[i].Category + "</td><td class='numeric-cell' data-collapsible-title='Amount:'>" + userexpenses[i].Amount + "</td><td class='numeric-cell' data-collapsible-title='Evidence:'>" + displayEvidence(userexpenses[i].Evidence) + "</td><td class='actions-cell'><a class='link icon-only' onclick=" + "approveExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + "," + "'" + escape(email) + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: green'>check</i></a><a class='link icon-only' onclick=" + "rejectExpense(" + userexpenses[i].report_ID + "," + "'" + username + "'" + "," + "'" + escape(userexpenses[i].Expense_Desc) + "'" + "," + "'" + escape(userexpenses[i].Category) + "'" + "," + "'" + userexpenses[i].Amount + "'" + "," + "'" + escape(email) + "'" + ")" + "><i class='icon f7-icons if-not-md' style='color: red'>close</i></a></td></tr>";
     }
   }
     return "<table><thead><tr><th class='checkbox-cell'><label class='checkbox'><input type='checkbox' disabled><i class='icon-checkbox'></i></label></th><th class='label-cell'>Project Name:</th><th class='numeric-cell'>Report ID:</th><th class='numeric-cell'>Description:</th><th class='numeric-cell'>Category:</th><th class='numeric-cell'>Amount:</th><th class='numeric-cell'>Evidence:</th><th class='numeric-cell'>Approve / Reject:</th></tr></thead><tbody>" + rows + "</tbody></table>";
 }
 
 function displayCategories(categories){
-  console.log(categories);
     while(document.getElementById("categories") != null) {
     document.getElementById("categories").innerHTML = "";
     if(categories.length > 0){
@@ -453,7 +458,6 @@ function displayFormData(){
 function addExpenseReport(){
   let hasFetched = false;
   var formData = app.form.convertToData('#uploadForm');
-  if(formData.desc != "" && formData.amount != ""){
   let newprojectid = fetch("https://stormy-coast-58891.herokuapp.com/maxprojectid/")
   .then(response => response.json())
   .then(response => {if(response.length > 0){ hasFetched = true; formData.reportId = ((response[0].Report_ID) + 1)}})
@@ -468,13 +472,7 @@ function addExpenseReport(){
   let newobject = {User_ID: formData.userId, Report_ID: formData.reportId, Date_of_Submission: formData.subdate, Reciept: formData.reciept, Expense_Desc: formData.desc, Category: formData.category, Client_Name: formData.clientname, Client_Project: formData.clientproject, Billable: formData.bill, Payment_Method: formData.paymeth, Amount: formData.amount};
   expenses.push(newobject);
   updateUserExpenses();
-
   app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); app.views.main.router.back();}})
-
-}
-  else{
-    app.dialog.alert("Please ensure all input boxes are filled out!", "Form incomplete ❌");
-  }
 }
 
 function removeExpenseReport(){
@@ -493,21 +491,25 @@ function removeExpenseReport(){
   displayAdminExpenses();
 }
 
-function approveExpense(id, username, desc, category, amount){
+function approveExpense(id, username, desc, category, amount, sender){
   dynamicPopup.open();
   document.getElementById("alertmessage").innerHTML = '<h1 style="text-align: center">Approve Report #' + id + '</h1><h3 style="text-align: center">Are you sure you want to approve this expense report?</h3>';
   document.getElementById("name").value = username;
   document.getElementById("subject").value = "Your Expense Report Was Approved!";
   document.getElementById("message").value = "Your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been approved! 😄👏";
+  document.getElementById("email").value = unescape(sender);
+  updateFormEmail();
   updateIndex(expenses.findIndex(item => item.report_ID === id));
 }
 
-function rejectExpense(id, username, desc, category, amount){
+function rejectExpense(id, username, desc, category, amount, sender){
   dynamicPopup.open();
   document.getElementById("alertmessage").innerHTML = '<h1 style="text-align: center">Reject Report #' + id + '</h1><h3 style="text-align: center">Are you sure you want to reject this expense report?</h3>';
   document.getElementById("name").value = username;
   document.getElementById("subject").value = "Your Expense Report Was Rejected!";
   document.getElementById("message").value = "Sorry your expense: " + unescape(desc) + ", Category: " + unescape(category) + ", Amount: " + amount + " has been rejected! 😭";
+  document.getElementById("email").value = unescape(sender);
+  updateFormEmail();
   updateIndex(expenses.findIndex(item => item.report_ID === id));
 }
 
@@ -526,6 +528,12 @@ function updateStatusBar() {
     if(logindata[0].hasOwnProperty("picture")){document.getElementById("drawer-icon").src = logindata[0].picture}
   } else {console.log("Failed to update status bar :(")}
 }
+
+function isActive(element){
+    let others = document.getElementsByClassName("drawer-list-item");
+    for(var i = 0; i < others.length; i++){if(others[i] != element){ others[i].className = "drawer-list-item"; } else {element.classList.add("is-active");} }
+    app.panel.close();
+  }
 
 function fillFormData(x){
   switch(x){
@@ -575,4 +583,25 @@ function displayPhotos(string){
   let photos = raw_data.split(" ");
   photobrowse.params.photos = photos.map(photo => '/uploads/' + photo);
   photobrowse.open();
+}
+
+function updateExpense(id){
+  dynamicPopup.open();
+  // Reset Form with data
+  document.getElementById("myForm").innerHTML = '<div class="list no-hairlines-md" style="top:-20px"><ul><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"></div><div class="item-inner"><div class="item-title item-label">Date: </div><div class="item-input-wrap"><input id="date" type="date" name="date" placeholder="Please choose..." class="input-with-value"></div></div></li><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Reciept: </div><div class="item-input-wrap input-dropdown-wrap"><select placeholder="Please choose..." name="reciept" class="input-with-value"></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media" style="padding-left: 0px"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Description: </div><div class="item-input-wrap"><textarea name="description" placeholder="Description goes here.." spellcheck="true" style="height:25px"></textarea></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Category: </div><div class="item-input-wrap input-dropdown-wrap"><select name="category" id="category" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media" style="padding-left: 0px"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Client Name: </div><div class="item-input-wrap input-dropdown-wrap"><select name="client" id="clientname" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Project Name: </div><div class="item-input-wrap input-dropdown-wrap"><select name="project" id="projectname" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Payment Method: </div><div class="item-input-wrap input-dropdown-wrap"><select name="payment" placeholder="Please choose..." class="input-with-value"></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Amount (£): </div><div class="item-input-wrap"><input name="amount" type="number" required></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Evidence: </div><div class="item-input-wrap"><input type="file" name="myImage" accept="image/jpg, image/jpeg, image/png" multiple required></div></div></li></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" type="button" onclick="dynamicPopup.close();">Close</button></div><div class="col"><button class="button button-fill-md color-green" type="button">Update Changes</button></div></div>';
+  let element = document.getElementById("myForm").nextElementSibling;
+  if(element) { element.remove(); }
+  // Now Validate and Update Changes...
+  console.log(id);
+}
+
+// Optional Function
+function changeTheme(string){
+  if(string == "dark") {
+    $("*").css("background-color","black");
+    $("*").css("color","white");
+  } else if(string == "light"){
+    $("*").css("background-color","white");
+    $("*").css("color","black");
+  }
 }

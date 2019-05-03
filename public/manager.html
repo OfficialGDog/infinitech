@@ -14,10 +14,133 @@
             <p class="segmented segmented-raised segmented-round">
                 <button class="button button-round button-active" onclick="displayTimeline('false')">Manage</button>
                 <button class="button button-round" onclick="ac1.open()">More</button>
-                <button class="button button-round" onclick="displayTimeline('true')">Timeline</button>
+                <button class="button button-round" onclick="displayTimeline('true')">Archive</button>
               </p>
         </div>
-        <div id="page1">First Page</div>
+        <div id="page1" class="block">
+            <div class="card data-table data-table-collapsible data-table-init" style="height:auto">
+                <div class="card-header">
+                  <div class="data-table-title">Categories</div>
+                  <div class="data-table-actions">
+                      <div class="data-table-links">
+                          <a class="link"><i class="f7-icons" style="padding-top:4px">add_round</i></a>
+                        </div>
+                  </div>
+                </div>
+                <div class="card-content">
+                    <div class="list accordion-list">
+                        <ul>
+                          <li class="accordion-item"><a href="#" class="item-content item-link">
+                              <div class="item-inner">
+                                <div class="item-title">Expand</div>
+                              </div></a>
+                            <div class="accordion-item-content">
+                              <div class="block">
+                                  <table>
+                                      <tbody>
+                                        <tr>
+                                          <td class="label-cell" data-collapsible-title="Category Name:">Travel Expenses</td>
+                                          <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                        </tr>
+                                      <tr>
+                                          <td class="label-cell" data-collapsible-title="Category Name:">Consumables</td>
+                                          <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                        </tr><tr>
+                                          <td class="label-cell" data-collapsible-title="Category Name:">Transport</td>
+                                          <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                        </tr><tr>
+                                          <td class="label-cell" data-collapsible-title="Category Name:">Food Expenses</td>
+                                          <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                        </tr></tbody>
+                                    </table>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                </div>
+              </div>
+              <br>
+              <div class="card data-table data-table-collapsible data-table-init" style="height:auto">
+                  <div class="card-header">
+                    <div class="data-table-title">Client Name</div>
+                    <div class="data-table-actions">
+                        <div class="data-table-links">
+                            <a class="link"><i class="f7-icons" style="padding-top:4px">add_round</i></a>
+                          </div>
+                    </div>
+                  </div>
+                  <div class="card-content">
+                      <div class="list accordion-list">
+                          <ul>
+                            <li class="accordion-item"><a href="#" class="item-content item-link">
+                                <div class="item-inner">
+                                  <div class="item-title">Expand</div>
+                                </div></a>
+                              <div class="accordion-item-content">
+                                <div class="block">
+                                    <table>
+                                        <tbody>
+                                          <tr>
+                                            <td class="label-cell" data-collapsible-title="Client Name:">Saggezza UK</td>
+                                            <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                          </tr>
+                                        <tr>
+                                            <td class="label-cell" data-collapsible-title="Client Name:">Saggezza US</td>
+                                            <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                          </tr><tr>
+                                            <td class="label-cell" data-collapsible-title="Client Name:">Untitled</td>
+                                            <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                          </tr></tbody>
+                                      </table>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                  </div>
+                </div>
+                <br>
+                <div class="card data-table data-table-collapsible data-table-init" style="height:auto">
+                    <div class="card-header">
+                      <div class="data-table-title">Client Project</div>
+                      <div class="data-table-actions">
+                          <div class="data-table-links">
+                              <a class="link"><i class="f7-icons" style="padding-top:4px">add_round</i></a>
+                            </div>
+                      </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="list accordion-list">
+                            <ul>
+                              <li class="accordion-item"><a href="#" class="item-content item-link">
+                                  <div class="item-inner">
+                                    <div class="item-title">Expand</div>
+                                  </div></a>
+                                <div class="accordion-item-content">
+                                  <div class="block">
+                                      <table>
+                                          <tbody>
+                                            <tr>
+                                              <td class="label-cell" data-collapsible-title="Client Project:">Project Expenses</td>
+                                              <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                            </tr>
+                                          <tr>
+                                              <td class="label-cell" data-collapsible-title="Client Project:">Group Work</td>
+                                              <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                            </tr><tr>
+                                              <td class="label-cell" data-collapsible-title="Client Project:">Building a wall</td>
+                                              <td class="actions-cell" data-collapsible-title=""><a class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td>
+                                            </tr></tbody>
+                                        </table>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                    </div>
+                  </div>
+        </div>
         <div class="timeline tablet-sides" style="display:none">
             <div class="timeline-item">
                 <div class="timeline-item-date">21 <small>DEC</small></div>

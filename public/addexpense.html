@@ -2,7 +2,7 @@
         <div class="navbar">
           <div class="navbar-inner sliding">
             <div class="left">
-              <a href="/categories/" class="link back">
+              <a href="/categories/" class="link back" onclick="isActive(document.getElementsByClassName('drawer-list-item')['0'])">
                 <i class="icon icon-back"></i>
                 <span class="ios-only">Back</span>
               </a>
@@ -59,7 +59,7 @@
                         <div class="item-inner">
                           <div class="item-title item-label">Description: </div>
                           <div class="item-input-wrap">
-                            <textarea name="desc" placeholder="Description goes here.."></textarea>
+                            <textarea name="desc" placeholder="Description goes here.." required></textarea>
                           </div>
                         </div>
                       </li>
@@ -137,7 +137,7 @@
                                     <div class="item-inner">
                                         <div class="item-title item-label">Amount (£): </div>
                                         <div class="item-input-wrap">
-                                            <input name="amount" type="number">
+                                            <input name="amount" type="number" required>
                                           </div>
                                     </div>
                                   </li>

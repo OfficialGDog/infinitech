@@ -26,5 +26,13 @@ routes = [
     {
       path: '/manager/',
       url: './manager.html',
+    },
+    {
+      path: '/profile/',
+      url: './profile.html',
+    },
+    {
+      path: '/settings/',
+      url: './settings.html',
     }
   ];
