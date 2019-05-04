@@ -10,6 +10,7 @@ var categorydata = null;
 var filterPicker = null;
 var selected_index = null;
 var user_emails = null;
+var vcategory, vclientname, vprojectname;
 var bContinue = false;
 
 var app = new Framework7({
@@ -26,6 +27,7 @@ on: {
 },
 pageInit: function (page) {
 if(page.name=='expenses'){
+  bContinue = false;
   if(selected_index != null && filteredCategories != null && filteredProject != null && expenses != null){
     let filteredExpenses = null;
     let type = null;
@@ -60,7 +62,7 @@ if(page.name=='expenses'){
           break;
         }
         let randomcolor = colors[Math.floor(Math.random() * colors.length)];
-        document.getElementById("expenses").innerHTML += "<a href='#' onclick='updateExpense(" + filteredExpenses[i].Report_ID + ")'><div class='card theme-" + randomcolor + "' style='margin-top: 50px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888; height: 100px;'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>" + filteredExpenses[i].Amount + "</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + title + "</h3><h4 class='card__greytext' style='font-weight: normal;margin: auto;margin-top: 15px;margin-bottom: 15px;'>" + filteredExpenses[i].Client_Name + ", " + subtitle + "</h4><p class='card__greytext' style='width: 80%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + filteredExpenses[i].Expense_Desc + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>" + filteredExpenses[i].Status + "</div></div></div></div></div></a>";
+        document.getElementById("expenses").innerHTML += "<a href='#' onclick=" + "updateExpense(" + filteredExpenses[i].Report_ID + "," + "'" + filteredExpenses[i].Date_of_Submission + "'" + "," + "'" + filteredExpenses[i].Reciept + "'" + "," + "'" + escape(filteredExpenses[i].Expense_Desc) + "'" + "," + "'" + escape(filteredExpenses[i].Category) + "'" + "," + "'" + escape(filteredExpenses[i].Client_Name) + "'" + "," + "'" + escape(filteredExpenses[i].Client_Project) + "'" + "," + "'" + escape(filteredExpenses[i].Payment_Method) + "'" + "," + "'" + filteredExpenses[i].Amount + "'" + ")><div class='card theme-" + randomcolor + "' style='margin-top: 50px'><div class='card__part card__part-2 card__hover'><div class='card__part__side m--back'><div class='card__part__inner card__face' style='box-shadow: 5px 10px 8px #888888; height: 100px;'><div class='card__face__colored-side'></div><div style='float: right;position: relative;top: 0px;padding-right: 10px;' class='card__greytext'><span>" + filteredExpenses[i].Amount + "</span><i class='f7-icons' style='position: absolute;top: 25px;font-size: 20px;padding-left: 5px'>chevron_right</i></div><h3 class='card__face__price ng-binding text-limited'>" + title + "</h3><h4 class='card__greytext' style='font-weight: normal;margin: auto;margin-top: 15px;margin-bottom: 15px;'>" + filteredExpenses[i].Client_Name + ", " + subtitle + "</h4><p class='card__greytext' style='width: 80%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>" + filteredExpenses[i].Expense_Desc + "</p><div class='card__greytext' style='font-size: 15px'><i class='f7-icons' style='font-size: 18px; padding-right: 10px'>time</i>" + filteredExpenses[i].Status + "</div></div></div></div></div></a>";
       }
     }
     selected_index = null;
@@ -80,7 +82,6 @@ else if(page.name=='categories'){
     ],
     on: {
     change: function (picker, values, displayValues) {
-      bContinue = true;
       if(document.getElementById("filter").value != displayValues){
         const column = picker.cols[0];
         switch(displayValues[0]){
@@ -101,6 +102,7 @@ else if(page.name=='categories'){
 app.preloader.hide();
 }
 else if(page.name == 'addexpenses'){
+  bContinue = true;
   if(projectdata == null || categorydata == null){
      fetchFormData();
    }
@@ -137,9 +139,8 @@ else if(page.name == 'addexpenses'){
               console.error('Error: ' + xhr.status);
               app.dialog.alert("Uh oh! Something went terribly wrong!! please try again later.", "Sorry 😭😭");
               },
-              success: function(response) {
+              success: function() {
               addExpenseReport();
-              console.log(response);
               }
               });
              }
@@ -422,8 +423,10 @@ function displayFormData(){
   projectNameElement.style = "";
   categoryElement.style = "";
 
-  document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
-  document.getElementById("userid").innerHTML = "<input type='text' name='userId' readonly value='" + logindata[0].id + "'></input>";
+  if(bContinue) {
+    // Only run this code if user wants to creates a new expense report
+    document.getElementById("username").innerHTML = "<input type='text' readonly value='" + logindata[0].name + "'></input>";
+    document.getElementById("userid").innerHTML = "<input type='text' name='userId' readonly value='" + logindata[0].id + "'></input>";
 
     var d = new Date(),
         month = '' + (d.getMonth() + 1),
@@ -434,6 +437,7 @@ function displayFormData(){
     if (day.length < 2) {day = '0' + day};
 
     document.getElementById("date").value = [year, month, day].join('-');
+  }
 
   if(projectdata.length > 0 && categorydata.length > 0){
     for(var i = 0; i < projectdata.length; i++){
@@ -453,6 +457,10 @@ function displayFormData(){
       projectNameElement.remove(projectdata.length);
       categoryElement.remove(categorydata.length);
   }
+
+  if(!bContinue){
+    updateFormData();
+  }
 }
 
 function addExpenseReport(){
@@ -466,7 +474,6 @@ function addExpenseReport(){
   formData.amount = "£" + formData.amount;
   Promise.all([newprojectid]).then(function(){if(hasFetched){
   app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addexpense', formData); 
-  if(bContinue) {filterPicker.setValue([filterPicker.cols[0].values[0]]);}
   // Update the front end
   app.preloader.hide();
   let newobject = {User_ID: formData.userId, Report_ID: formData.reportId, Date_of_Submission: formData.subdate, Reciept: formData.reciept, Expense_Desc: formData.desc, Category: formData.category, Client_Name: formData.clientname, Client_Project: formData.clientproject, Billable: formData.bill, Payment_Method: formData.paymeth, Amount: formData.amount};
@@ -585,23 +592,69 @@ function displayPhotos(string){
   photobrowse.open();
 }
 
-function updateExpense(id){
+function updateExpense(id, date, reciept, description, category, client, project, paymeth, amount){
   dynamicPopup.open();
   // Reset Form with data
-  document.getElementById("myForm").innerHTML = '<div class="list no-hairlines-md" style="top:-20px"><ul><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"></div><div class="item-inner"><div class="item-title item-label">Date: </div><div class="item-input-wrap"><input id="date" type="date" name="date" placeholder="Please choose..." class="input-with-value"></div></div></li><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Reciept: </div><div class="item-input-wrap input-dropdown-wrap"><select placeholder="Please choose..." name="reciept" class="input-with-value"></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media" style="padding-left: 0px"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Description: </div><div class="item-input-wrap"><textarea name="description" placeholder="Description goes here.." spellcheck="true" style="height:25px"></textarea></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Category: </div><div class="item-input-wrap input-dropdown-wrap"><select name="category" id="category" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media" style="padding-left: 0px"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Client Name: </div><div class="item-input-wrap input-dropdown-wrap"><select name="client" id="clientname" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Project Name: </div><div class="item-input-wrap input-dropdown-wrap"><select name="project" id="projectname" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Payment Method: </div><div class="item-input-wrap input-dropdown-wrap"><select name="payment" placeholder="Please choose..." class="input-with-value"></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Amount (£): </div><div class="item-input-wrap"><input name="amount" type="number" required></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Evidence: </div><div class="item-input-wrap"><input type="file" name="myImage" accept="image/jpg, image/jpeg, image/png" multiple required></div></div></li></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" type="button" onclick="dynamicPopup.close();">Close</button></div><div class="col"><button class="button button-fill-md color-green" type="button">Update Changes</button></div></div>';
+  document.getElementById("myForm").innerHTML = '<input id="report_id" name="report_id" type="number" class="input-with-value" readonly required style="display:none"><div class="list no-hairlines-md" style="top:-20px"><ul><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"></div><div class="item-inner"><div class="item-title item-label">Date: </div><div class="item-input-wrap"><input id="date" type="date" name="date" placeholder="Please choose..." class="input-with-value" required></div></div></li><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Reciept: </div><div class="item-input-wrap input-dropdown-wrap"><select placeholder="Please choose..." name="reciept" class="input-with-value"><option value="hard">Hard copy</option><option value="soft">Soft copy</option><option value="no">No</option></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media" style="padding-left: 0px"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Description: </div><div class="item-input-wrap"><textarea id="desc" name="description" placeholder="Description goes here.." spellcheck="true" style="height:25px" required></textarea></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Category: </div><div class="item-input-wrap input-dropdown-wrap"><select name="category" id="category" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media" style="padding-left: 0px"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Client Name: </div><div class="item-input-wrap input-dropdown-wrap"><select name="client" id="clientname" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Project Name: </div><div class="item-input-wrap input-dropdown-wrap"><select name="project" id="projectname" placeholder="Please choose..."></select></div></div></li><li class="item-content item-input item-input-with-value" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Payment Method: </div><div class="item-input-wrap input-dropdown-wrap"><select name="payment" placeholder="Please choose..." class="input-with-value"><option value="Own Payment">Own Payment</option><option value="Corporate Card">Corporate Card</option></select></select></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Amount (£): </div><div class="item-input-wrap"><input id="amount" name="amount" type="number" required></div></div></li><li class="item-content item-input" style="padding-left: 0px"><div class="item-media"><i class="icon demo-list-icon"></i></div><div class="item-inner"><div class="item-title item-label">Evidence: </div><div class="item-input-wrap"><input type="file" name="myImage" accept="image/jpg, image/jpeg, image/png" multiple required></div></div></li></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" type="button" onclick="dynamicPopup.close();">Close</button></div><div class="col"><button class="button button-fill-md color-green" type="button" onclick="confirmChanges()">Update Changes</button></div></div>';
   let element = document.getElementById("myForm").nextElementSibling;
   if(element) { element.remove(); }
-  // Now Validate and Update Changes...
-  console.log(id);
+  // Now display values...
+  document.getElementById("desc").innerText = unescape(description);
+  document.getElementById("amount").value = amount.substring(1, amount.length);
+  // Check format of date string and display value...
+  if(date.includes("/")) {
+    document.getElementById("date").value = date.replace(new RegExp('/', 'g'), '-').split("-").reverse().join("-");
+  } else {document.getElementById("date").value = date}
+
+  document.getElementById("report_id").value = id;
+  vclientname = unescape(client);
+  vcategory = unescape(category);
+  vprojectname = unescape(project);
+  fetchFormData();
 }
 
-// Optional Function
-function changeTheme(string){
-  if(string == "dark") {
-    $("*").css("background-color","black");
-    $("*").css("color","white");
-  } else if(string == "light"){
-    $("*").css("background-color","white");
-    $("*").css("color","black");
+
+function updateFormData(){
+  let categoryElement = document.getElementById("category");
+  let clientNameElement = document.getElementById("clientname");
+  let projectNameElement = document.getElementById("projectname");
+
+  for(var i = 0; i < categoryElement.options.length; i++){
+    if(categoryElement.options[i].innerText == vcategory){
+      categoryElement.selectedIndex = i;
+    }
   }
+  for(var i = 0; i < clientNameElement.options.length; i++){
+    if(clientNameElement.options[i].innerText == vclientname){
+      clientNameElement.selectedIndex = i;
+    }
+  }
+  for(var i = 0; i < projectNameElement.options.length; i++){
+    if(projectNameElement.options[i].innerText == vprojectname){
+      projectNameElement.selectedIndex = i;
+    }
+  }
+}
+
+function confirmChanges(){
+  // Update Database
+  app.preloader.show();
+  var formData = app.form.convertToData('#myForm');
+  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/updateexpense', formData);
+  // Update Front End
+  const index = expenses.map(e => e.Report_ID).indexOf(parseInt(formData.report_id))
+  expenses[index].Date_of_Submission = formData.date;
+  expenses[index].Reciept = formData.reciept;
+  expenses[index].Expense_Desc = formData.description;
+  expenses[index].Category = formData.category;
+  expenses[index].Client_Name = formData.client;
+  expenses[index].Client_Project = formData.project;
+  expenses[index].Payment_Method = formData.payment;
+  expenses[index].Amount = "£" + formData.amount;
+  updateUserExpenses();
+  app.preloader.hide();
+  dynamicPopup.close();
+  // Display Success
+  app.dialog.alert("Expense updated successfully!", "Success! 😄👏");
+  app.views.main.router.back();
 }

@@ -294,10 +294,10 @@ router.get("/categories/", (req, res) => {
     })
 })
 
-router.put('/updateexpense', urlencodedParser, function(req, res) {
+router.post('/updateexpense', urlencodedParser, function(req, res) {
     console.log("Trying to update expense report...")
-    params = [req.body.date,req.body.reciept,req.body.description,req.body.category,req.body.client,req.body.project,req.body.bill,req.body.payment,req.body.amount,req.body.report_id];
-    const queryString = "UPDATE report SET Date_of_Submission = ?, Reciept = ?, Expense_Desc = ?, Category = ?, Client_Name = ?, Client_Project = ?, Billable = ?, Payment_Method = ?, Amount = ? WHERE Report_ID = ?"
+    params = [req.body.date,req.body.reciept,req.body.description,req.body.category,req.body.client,req.body.project,req.body.payment,req.body.amount,req.body.report_id];
+    const queryString = "UPDATE report SET Date_of_Submission = ?, Reciept = ?, Expense_Desc = ?, Category = ?, Client_Name = ?, Client_Project = ?, Payment_Method = ?, Amount = ? WHERE Report_ID = ?"
   
     getConnection().query(queryString, params, function (err, results, fields) {
         if(err) {
