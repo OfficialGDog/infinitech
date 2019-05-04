@@ -156,6 +156,7 @@ else if(page.name == 'admin'){
   console.log("admin page loaded!");
 }
 else if(page.name == 'manager'){
+  updateStatusBar();
   fetchUserEmails();
   document.getElementsByClassName("drawer-list-item")[0].href = "/manager/";
   app.preloader.hide();
@@ -175,7 +176,7 @@ else if(page.name == 'manager'){
 });
 
 var dynamicPopup = app.popup.create({
-  content: '<div class="popup"><div class="block" style="height:100%"><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess();' + 'removeExpenseReport()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="subject" name="subject" placeholder="Subject" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input item-input-with-value" style="display: none"><div class="item-inner"><div class="item-input-wrap"><textarea id="others" name="others" placeholder="cc" class="input-with-value"></textarea><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
+  content: '<div class="popup"><div class="block" style="height:100%"><i class="icon f7-icons" style="top:-15px;" onclick="dynamicPopup.close()">close</i><form id="myForm" class="gform pure-form pure-form-stacked" method="POST" data-email="" action="https://script.google.com/macros/s/AKfycbxSpRr_JqfzJC49xvYpb-0N8vGMa0UuvwyDtS5d/exec" onsubmit="displayFormSuccess();' + 'removeExpenseReport()"><div id="alertmessage"></div><div class="list inset"><ul><div class="form-elements"><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="name" name="name" placeholder="Username" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px;"><div class="item-inner"><div class="item-input-wrap"><input type="text" id="subject" name="subject" placeholder="Subject" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input" style="margin-bottom: 15px"><div class="item-inner"><div class="item-input-wrap"><textarea id="message" name="message" rows="10" placeholder="Your message..." required spellcheck="true"></textarea><span class="input-clear-button"></span></div></div></li><li class="item-content item-input"><div class="item-inner"><div class="item-input-wrap"><input type="email" id="email" name="email" placeholder="E-mail" oninput="updateFormEmail()" required><span class="input-clear-button"></span></div></div></li><li class="item-content item-input item-input-with-value" style="display: none"><div class="item-inner"><div class="item-input-wrap"><textarea id="others" name="others" placeholder="cc" class="input-with-value"></textarea><span class="input-clear-button"></span></div></div></li></div></ul></div><div class="block block-strong row no-hairlines" style="position: absolute; bottom: 0px; width: 100%; left: 0px"><div class="col"><button class="button popup-close button-fill-md color-red" href="#" type="button">Cancel</button></div><div class="col"><button class="button button-fill-md color-green" href="#" type="submit">Confirm</button></div></div></form><h4 style="text-align: center; font-weight: normal; font-style: italic">An automatic email 📧 will be sent to the user.</h4></div></div>',
   on: {
     opened: function (popup) {
       loaded();
@@ -283,18 +284,24 @@ function saveLogin(response){
 function validateSocialMediaLogin(googleid, facebookid){
   let isUser = null;
   let isAdmin = null;
+  let isManager = null;
 
   let user = fetch(`https://stormy-coast-58891.herokuapp.com/user_social_login?googleid=${googleid}&facebookid=${facebookid}`)
   .then(response => response.json())
-  .then(response => {console.log(response); if(response.length == 0) {isUser = false;} else if(response.length == 1){logindata[0].id = response[0].User_ID; logindata[0].name = response[0].User_Username; logindata[0].email = response[0].User_Email; app.views.main.router.navigate('/categories/'); isUser = true;}})
+  .then(response => {if(response.length == 0) {isUser = false;} else if(response.length == 1){logindata[0].id = response[0].User_ID; logindata[0].name = response[0].User_Username; logindata[0].email = response[0].User_Email; app.views.main.router.navigate('/categories/'); isUser = true;}})
   .catch(err => console.error(err))
 
   let admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_social_login?googleid=${googleid}&facebookid=${facebookid}`)
   .then(response => response.json())
-  .then(response => {console.log(response); if(response.length == 0) {isAdmin = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); isAdmin = true;}})
+  .then(response => {if(response.length == 0) {isAdmin = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); isAdmin = true;}})
   .catch(err => console.error(err))
 
-  Promise.all([user,admin]).then(function(){if(isUser == null || isAdmin == null){app.dialog.alert("There are too many users are associated with that account, please contact ­the system administrator.", "Too many users registered!");} else if(!isUser && !isAdmin){app.dialog.alert("Sorry we couldn't find an account with the login you provided to us.­ 🤷", "User account not found! 😲");}})
+  let manager = fetch(`https://stormy-coast-58891.herokuapp.com/manager_social_login?googleid=${googleid}&facebookid=${facebookid}`)
+  .then(response => response.json())
+  .then(response => {if(response.length == 0) {isManager = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); isManager = true;}})
+  .catch(err => console.error(err))
+
+  Promise.all([user,admin,manager]).then(function(){if(isUser == null || isAdmin == null || isManager){app.dialog.alert("There are too many users are associated with that account, please contact ­the system administrator.", "Too many users registered!");} else if(!isUser && !isAdmin && !isManager){let idtype = null; if(googleid) {idtype = "googleID: #" + googleid} else if(facebookid) {idtype = "facebookID: #" + facebookid} app.dialog.alert("Sorry we couldn't find an account with the login you provided to us.­ 🤷 " + idtype, "User account not found! 😲");}})
 }
 
 function fetchExpenses(id){
@@ -637,24 +644,32 @@ function updateFormData(){
 }
 
 function confirmChanges(){
-  // Update Database
-  app.preloader.show();
   var formData = app.form.convertToData('#myForm');
-  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/updateexpense', formData);
-  // Update Front End
   const index = expenses.map(e => e.Report_ID).indexOf(parseInt(formData.report_id))
-  expenses[index].Date_of_Submission = formData.date;
-  expenses[index].Reciept = formData.reciept;
-  expenses[index].Expense_Desc = formData.description;
-  expenses[index].Category = formData.category;
-  expenses[index].Client_Name = formData.client;
-  expenses[index].Client_Project = formData.project;
-  expenses[index].Payment_Method = formData.payment;
-  expenses[index].Amount = "£" + formData.amount;
-  updateUserExpenses();
-  app.preloader.hide();
-  dynamicPopup.close();
+  // Validate at least 1 field has changed
+  if(expenses[index].Date_of_Submission != formData.date || expenses[index].Expense_Desc != formData.description || expenses[index].Category != formData.category || expenses[index].Client_Name != formData.client || expenses[index].Client_Project != formData.project || expenses[index].Amount != ("£" + formData.amount)){
+    // Update Database
+    app.preloader.show();
+    formData.amount = "£" + formData.amount;
+    app.request.postJSON('https://stormy-coast-58891.herokuapp.com/updateexpense', formData);
+  // Update Front End
+    expenses[index].Date_of_Submission = formData.date;
+    expenses[index].Reciept = formData.reciept;
+    expenses[index].Expense_Desc = formData.description;
+    expenses[index].Category = formData.category;
+    expenses[index].Client_Name = formData.client;
+    expenses[index].Client_Project = formData.project;
+    expenses[index].Payment_Method = formData.payment;
+    expenses[index].Amount = formData.amount;
+    updateUserExpenses();
+    app.preloader.hide();
+    dynamicPopup.close();
   // Display Success
-  app.dialog.alert("Expense updated successfully!", "Success! 😄👏");
-  app.views.main.router.back();
+    app.dialog.alert("Expense updated successfully!", "Success! 😄👏");
+    app.views.main.router.back();
+  }
+  else
+  {
+    app.dialog.alert("You must change at least 1 field!", "InfiniTech 👊");
+  }
 }

@@ -103,7 +103,7 @@ router.get("/user_social_login", (req, res) => {
     const queryString = `SELECT User_ID, User_Username, User_Email FROM user WHERE User_Google_ID = '${googleid}' or User_Facebook_ID = '${facebookid}'`
     connection.query(queryString, (err, rows, fields) => {
         if(err){
-            console.log("Failed to query for users: " + err)
+            console.log("Social media login credentials not valid for users: " + err)
             return res.sendStatus(500)
         }
         return res.json(rows)
@@ -117,7 +117,21 @@ router.get("/admin_social_login", (req, res) => {
     const queryString = `SELECT Admin_ID, Admin_Username, Admin_Email FROM admin WHERE Admin_Google_ID = '${googleid}' or Admin_Facebook_ID = '${facebookid}'`
     connection.query(queryString, (err, rows, fields) => {
         if(err){
-            console.log("Failed to query for users: " + err)
+            console.log("Social media login credentials not valid for admins: " + err)
+            return res.sendStatus(500)
+        }
+        return res.json(rows)
+    })
+})
+
+router.get("/manager_social_login", (req, res) => {
+    console.log("Searching manager table with provided credentials...");
+    const {googleid, facebookid} = req.query;
+    const connection = getConnection()
+    const queryString = `SELECT Manager_ID, Manager_Username, Manager_Email FROM manager WHERE Manager_Google_ID = '${googleid}' or Manager_Facebook_ID = '${facebookid}'`
+    connection.query(queryString, (err, rows, fields) => {
+        if(err){
+            console.log("Social media login credentials not valid for managers: " + err)
             return res.sendStatus(500)
         }
         return res.json(rows)
