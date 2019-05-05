@@ -32,7 +32,7 @@ routes = [
       url: './profile.html',
     },
     {
-      path: '/settings/',
-      url: './settings.html',
+      path: '/about/',
+      url: './about.html',
     }
   ];

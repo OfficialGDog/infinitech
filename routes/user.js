@@ -324,6 +324,30 @@ router.post('/updateexpense', urlencodedParser, function(req, res) {
     res.end()
   })
 
+  router.post('/profile', urlencodedParser, function(req, res) {
+    console.log("Trying to update existing profile");
+    const table = req.body.table;
+    const user_column = req.body.username_col;
+    const pass_column = req.body.password_col;
+    const google_column = req.body.google_col;
+    const facebook_column = req.body.facebook_col;
+    const email_column = req.body.email_col;
+    const id_column = req.body.id_col;
+    params = [req.body.username,req.body.password,req.body.google,req.body.facebook,req.body.email,req.body.id];
+    const queryString = "UPDATE " + table + " SET " + user_column + "= ?, " + pass_column + "= ?, " + google_column + "= ?, " + facebook_column + " = ?, " + email_column + " = ? WHERE " + id_column + " = ?"
+  
+    getConnection().query(queryString, params, function (err, results, fields) {
+        if(err) {
+            console.log(queryString);
+            console.log("Failed to update existing account:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record was updated!");
+        res.end()
+    })
+    res.end()
+  })
+
 
 const pool = mysql.createPool({
     connectionLimit: 10,

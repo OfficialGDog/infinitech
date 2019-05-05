@@ -1,16 +1,10 @@
 const colors = ['green', 'purple', 'orange', 'red'];
 const error_message = "<img src='assets/error.jpg' style='object-fit: cover;display: block;margin-left: auto;margin-right: auto;'>";
 var userexpenses = [];
-var logindata = null;
-var expenses = null;
-var filteredCategories = null;
-var filteredProject = null;
-var projectdata = null;
-var categorydata = null;
-var filterPicker = null;
-var selected_index = null;
-var user_emails = null;
-var vcategory, vclientname, vprojectname;
+var logindata = null, expenses = null, filteredCategories = null, filteredProject = null;
+var projectdata = null, categorydata = null, filterPicker = null, selected_index = null;
+var user_emails = null, vcategory, vclientname, vprojectname;
+var isUser = null, isAdmin = null, isManager = null;
 var bContinue = false;
 
 var app = new Framework7({
@@ -151,6 +145,7 @@ return false;
 else if(page.name == 'admin'){
   updateStatusBar();
   fetchAdminExpenses(logindata[0].id);
+  if(document.getElementsByClassName("drawer-list-item")[1].childNodes[2].innerText == "Add Expense") {document.getElementsByClassName("drawer-list-item")[1].remove();}
   document.getElementsByClassName("drawer-list-item")[0].href = "/admin/";
   app.preloader.hide();
   console.log("admin page loaded!");
@@ -158,9 +153,65 @@ else if(page.name == 'admin'){
 else if(page.name == 'manager'){
   updateStatusBar();
   fetchUserEmails();
+  if(document.getElementsByClassName("drawer-list-item")[1].childNodes[2].innerText == "Add Expense") {document.getElementsByClassName("drawer-list-item")[1].remove();}
   document.getElementsByClassName("drawer-list-item")[0].href = "/manager/";
   app.preloader.hide();
   console.log("manager page loaded!");
+  
+}
+else if(page.name == 'profile'){
+    let type = null;
+    if(isUser){
+    type = "user";
+    }else if(isAdmin) {
+    type = "admin";
+    }else if(isManager) {
+    type = "manager"}
+    
+    // Update the form
+    document.getElementById("myuser").value = logindata[0].name;
+    document.getElementById("mypass").value = logindata[0].pass;
+    document.getElementById("myemail").value = logindata[0].email;
+    document.getElementById("mygoogle").value = logindata[0].gid;
+    document.getElementById("myfacebook").value = logindata[0].fid;
+    document.getElementById("table").value = type;
+    document.getElementById("user_col").value = type + "_username";
+    document.getElementById("password_col").value = type + "_password";
+    document.getElementById("google_col").value = type + "_google_id";
+    document.getElementById("facebook_col").value = type + "_facebook_id";
+    document.getElementById("id_col").value = type + "_id";
+    document.getElementById("id").value = logindata[0].id;
+    document.getElementById("email_col").value = type + "_email";
+
+      // Wait for Form Submission...
+    $('#updateProfile').submit(function() {
+          // Convert form data into JSON
+          var formData = app.form.convertToData('#updateProfile');
+          // Validate at least one field has changed
+          if(logindata[0].name != formData.username || logindata[0].pass != formData.password || logindata[0].email != formData.email || logindata[0].gid != formData.google || logindata[0].fid != formData.facebook) {
+          // Send to the server
+          formData.id = parseInt(formData.id);
+          app.request.postJSON('https://stormy-coast-58891.herokuapp.com/profile', formData);
+          // Update Front End
+          logindata[0].name = formData.username;
+          logindata[0].pass = formData.password;
+          logindata[0].email = formData.email;
+          logindata[0].gid = formData.google;
+          logindata[0].fid = formData.facebook;
+          // Display Success
+          app.dialog.alert("New profile was saved successfully.", "Success! 😄👏");
+          let home = document.getElementsByClassName("drawer-list-item")[0];
+          isActive(home);
+          home.click();
+          }
+          else{
+            app.dialog.alert("You must change at least 1 field!", "InfiniTech 👊");
+          }
+        
+          // Finally stop the page from reloading
+          return false;
+          
+  }); 
 }
 },
 },
@@ -265,13 +316,16 @@ function onFBSignin() {
 
 function saveLogin(response){
   if(response[0].hasOwnProperty("User_Username")){
-      logindata = response.map(item => ({name: item.User_Username, email: item.User_Email, id: item.User_ID}));
+      logindata = response.map(item => ({name: item.User_Username, pass: item.User_Password, gid: item.User_Google_ID, fid: item.User_Facebook_ID, email: item.User_Email, id: item.User_ID}));
+      isUser = true;
   }
   else if(response[0].hasOwnProperty("Admin_Username")){
-      logindata = response.map(item => ({name: item.Admin_Username, email: item.Admin_Email, id: item.Admin_ID}));
+      logindata = response.map(item => ({name: item.Admin_Username, pass: item.Admin_Password, gid: item.Admin_Google_ID, fid: item.Admin_Facebook_ID, email: item.Admin_Email, id: item.Admin_ID}));
+      isAdmin = true;
   }
   else if(response[0].hasOwnProperty("Manager_Username")){
-    logindata = response.map(item => ({name: item.Manager_Username, email: item.Manager_Email, id: item.Manager_ID}));
+    logindata = response.map(item => ({name: item.Manager_Username, pass: item.Manager_Password, gid: item.Manager_Google_ID, fid: item.Manager_Facebook_ID, email: item.Manager_Email, id: item.Manager_ID}));
+    isManager = true;
   }
   else if(response[0].hasOwnProperty("name")){
       logindata = response.map(item => ({name: item.name, email: item.email, id: item.id, picture: item.picture}));
@@ -282,26 +336,26 @@ function saveLogin(response){
 }
 
 function validateSocialMediaLogin(googleid, facebookid){
-  let isUser = null;
-  let isAdmin = null;
-  let isManager = null;
+  let is_User = null;
+  let is_Admin = null;
+  let is_Manager = null;
 
   let user = fetch(`https://stormy-coast-58891.herokuapp.com/user_social_login?googleid=${googleid}&facebookid=${facebookid}`)
   .then(response => response.json())
-  .then(response => {if(response.length == 0) {isUser = false;} else if(response.length == 1){logindata[0].id = response[0].User_ID; logindata[0].name = response[0].User_Username; logindata[0].email = response[0].User_Email; app.views.main.router.navigate('/categories/'); isUser = true;}})
+  .then(response => {if(response.length == 0) {is_User = false;} else if(response.length == 1){logindata[0].id = response[0].User_ID; logindata[0].name = response[0].User_Username; logindata[0].email = response[0].User_Email; app.views.main.router.navigate('/categories/'); is_User = true; isUser = true}})
   .catch(err => console.error(err))
 
   let admin = fetch(`https://stormy-coast-58891.herokuapp.com/admin_social_login?googleid=${googleid}&facebookid=${facebookid}`)
   .then(response => response.json())
-  .then(response => {if(response.length == 0) {isAdmin = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); isAdmin = true;}})
+  .then(response => {if(response.length == 0) {is_Admin = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); is_Admin = true; isAdmin = true}})
   .catch(err => console.error(err))
 
   let manager = fetch(`https://stormy-coast-58891.herokuapp.com/manager_social_login?googleid=${googleid}&facebookid=${facebookid}`)
   .then(response => response.json())
-  .then(response => {if(response.length == 0) {isManager = false} else if(response.length == 1){logindata[0].id = response[0].Admin_ID; logindata[0].name = response[0].Admin_Username; logindata[0].email = response[0].Admin_Email; app.views.main.router.navigate('/admin/'); isManager = true;}})
+  .then(response => {if(response.length == 0) {is_Manager = false} else if(response.length == 1){logindata[0].id = response[0].Manager_ID; logindata[0].name = response[0].Manager_Username; logindata[0].email = response[0].Manager_Email; app.views.main.router.navigate('/manager/'); is_Manager = true; isManager = true}})
   .catch(err => console.error(err))
 
-  Promise.all([user,admin,manager]).then(function(){if(isUser == null || isAdmin == null || isManager){app.dialog.alert("There are too many users are associated with that account, please contact ­the system administrator.", "Too many users registered!");} else if(!isUser && !isAdmin && !isManager){let idtype = null; if(googleid) {idtype = "googleID: #" + googleid} else if(facebookid) {idtype = "facebookID: #" + facebookid} app.dialog.alert("Sorry we couldn't find an account with the login you provided to us.­ 🤷 " + idtype, "User account not found! 😲");}})
+  Promise.all([user,admin,manager]).then(function(){if(is_User == null || is_Admin == null || is_Manager){app.dialog.alert("There are too many users are associated with that account, please contact ­the system administrator.", "Too many users registered!");} else if(!is_User && !is_Admin && !is_Manager){let idtype = null; if(googleid) {idtype = "googleID: #" + googleid} else if(facebookid) {idtype = "facebookID: #" + facebookid} app.dialog.alert("Sorry we couldn't find an account with the login you provided to us.­ 🤷 " + idtype, "User account not found! 😲");}})
 }
 
 function fetchExpenses(id){
@@ -486,7 +540,7 @@ function addExpenseReport(){
   let newobject = {User_ID: formData.userId, Report_ID: formData.reportId, Date_of_Submission: formData.subdate, Reciept: formData.reciept, Expense_Desc: formData.desc, Category: formData.category, Client_Name: formData.clientname, Client_Project: formData.clientproject, Billable: formData.bill, Payment_Method: formData.paymeth, Amount: formData.amount};
   expenses.push(newobject);
   updateUserExpenses();
-  app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); app.views.main.router.back();}})
+  app.dialog.alert("A new expense report has been created successfully!", "Success! 😄👏"); let home = document.getElementsByClassName("drawer-list-item")[0];isActive(home);home.click();}})
 }
 
 function removeExpenseReport(){
@@ -494,8 +548,8 @@ function removeExpenseReport(){
   let id = {id: expenses[selected_index].report_ID}
 
   // Copy the report into the archive table.
-  let archived = {userId: expenses[selected_index].User_ID, reportId: expenses[selected_index].report_ID, subdate: expenses[selected_index].Date_of_Submission, reciept: expenses[selected_index].Reciept, desc: expenses[selected_index].Expense_Desc, category: expenses[selected_index].Category, clientname: expenses[selected_index].Client_Name, clientproject: expenses[selected_index].Client_Project, bill: expenses[selected_index].Billable, paymeth: expenses[selected_index].Payment_Method, amount: expenses[selected_index].Amount};
-  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/archiveexpense', archived);
+  //let archived = {userId: expenses[selected_index].User_ID, reportId: expenses[selected_index].report_ID, subdate: expenses[selected_index].Date_of_Submission, reciept: expenses[selected_index].Reciept, desc: expenses[selected_index].Expense_Desc, category: expenses[selected_index].Category, clientname: expenses[selected_index].Client_Name, clientproject: expenses[selected_index].Client_Project, bill: expenses[selected_index].Billable, paymeth: expenses[selected_index].Payment_Method, amount: expenses[selected_index].Amount};
+  //app.request.postJSON('https://stormy-coast-58891.herokuapp.com/archiveexpense', archived);
   
   // Remove the report from the report table in the database.
   app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deleteexpense', id);
@@ -559,22 +613,6 @@ function fillFormData(x){
     document.getElementById("subject").value = "Incomplete Expense Submission Received";
     document.getElementById("message").value = "We have recently received your expenses claim submission. Unfortunately, some of the information required is missing. Please check your submission and complete in full. Incomplete submissions will not be approved.";
     break;
-  }
-}
-
-function displayTimeline(x){
-  if(x == "true"){
-    document.getElementsByClassName("timeline tablet-sides")[0].style = "display: block";
-    document.getElementById("page1").style = "display: none";
-    document.getElementsByClassName("button button-round")[2].classList.add("button-active");
-    let old = document.getElementsByClassName("button button-round")[0]; 
-    old.className = old.className.replace(" button-active", "");
-  } else{
-  document.getElementsByClassName("timeline tablet-sides")[0].style = "display: none";
-  document.getElementById("page1").style = "display: block";
-  document.getElementsByClassName("button button-round")[0].classList.add("button-active");
-  let old = document.getElementsByClassName("button button-round")[2]; 
-    old.className = old.className.replace(" button-active", "");
   }
 }
 
