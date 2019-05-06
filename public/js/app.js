@@ -711,3 +711,31 @@ function confirmChanges(){
     app.dialog.alert("You must change at least 1 field!", "InfiniTech 👊");
   }
 }
+
+function newItem(element){
+  app.dialog.prompt('Please enter a new category:', 'New Category', function (name) {
+    if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
+      let newelement = '<tr><td class="label-cell" data-collapsible-title="Category Name:">' + name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>';
+      element.childNodes[3].children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML += newelement;
+      app.dialog.alert(name + ' was added! 😄', 'Item Added 🎉');
+    }
+  });
+}
+
+function editItem(element){
+  let dialog = app.dialog.prompt('', 'Enter a new name:', function (name) {
+    if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
+      element.firstElementChild.innerText = name;
+      app.dialog.alert('Item was changed to: ' + name, 'Item Updated!');
+    }
+  });
+
+  dialog.$el.find('input').val(element.firstElementChild.innerText);
+}
+
+function deleteItem(element){
+  app.dialog.confirm('Are you sure you want to delete this?', 'Confirm Deletion', function () {
+    element.remove();
+    app.dialog.alert('Item Deleted! 😄', 'Item Removed 🗑');
+  });
+}
