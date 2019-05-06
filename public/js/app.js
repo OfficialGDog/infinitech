@@ -685,7 +685,7 @@ function confirmChanges(){
   var formData = app.form.convertToData('#myForm');
   const index = expenses.map(e => e.Report_ID).indexOf(parseInt(formData.report_id))
   // Validate at least 1 field has changed
-  if(expenses[index].Date_of_Submission != formData.date || expenses[index].Expense_Desc != formData.description || expenses[index].Category != formData.category || expenses[index].Client_Name != formData.client || expenses[index].Client_Project != formData.project || expenses[index].Amount != ("£" + formData.amount)){
+  if(expenses[index].Date_of_Submission != formData.date || expenses[index].Reciept != formData.reciept || expenses[index].Expense_Desc != formData.description || expenses[index].Category != formData.category || expenses[index].Client_Name != formData.client || expenses[index].Client_Project != formData.project || expenses[index].Payment_Method != formData.payment || expenses[index].Amount != ("£" + formData.amount)){
     // Update Database
     app.preloader.show();
     formData.amount = "£" + formData.amount;
