@@ -9,7 +9,7 @@ var bContinue = false;
 
 var app = new Framework7({
   picker: {
-    toolbarCloseText: ""
+    toolbarCloseText: "Close"
   },
   swipeout: {
     noFollow: true,
@@ -155,6 +155,7 @@ else if(page.name == 'manager'){
   fetchUserEmails();
   if(document.getElementsByClassName("drawer-list-item")[1].childNodes[2].innerText == "Add Expense") {document.getElementsByClassName("drawer-list-item")[1].remove();}
   document.getElementsByClassName("drawer-list-item")[0].href = "/manager/";
+  fetchFormData();
   app.preloader.hide();
   console.log("manager page loaded!");
   
@@ -473,7 +474,7 @@ function fetchFormData(){
   .then(response => {if(response.length > 0) {categorydata = response.slice(0)} else{categorydata = false}})
   .catch(err => console.error(err), categorydata = false)
 
-  Promise.all([datapack1,datapack2]).then(function(){if(categorydata && projectdata){displayFormData()} else {console.error("Failed to fetch data :("); document.getElementsByClassName("page-content")[1].innerHTML = error_message;}})
+  Promise.all([datapack1,datapack2]).then(function(){if(categorydata && projectdata){if(isUser) {displayFormData()} else {displayAdminTables()}} else {console.error("Failed to fetch data :("); document.getElementsByClassName("page-content")[1].innerHTML = error_message;}})
 }
 
 function displayFormData(){
@@ -712,30 +713,111 @@ function confirmChanges(){
   }
 }
 
-function newItem(element){
+function newItem(element, type){
+  if(type == 'Category Name:') {
   app.dialog.prompt('Please enter a new category:', 'New Category', function (name) {
     if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
-      let newelement = '<tr><td class="label-cell" data-collapsible-title="Category Name:">' + name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>';
+      let newelement = '<tr><td class="label-cell" data-collapsible-title=' + '"' + type + '"' + '>' + name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>';
       element.childNodes[3].children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML += newelement;
+      let catobject = {category: name}
+      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addcategory', catobject);
+      }
       app.dialog.alert(name + ' was added! 😄', 'Item Added 🎉');
-    }
   });
-}
-
-function editItem(element){
-  let dialog = app.dialog.prompt('', 'Enter a new name:', function (name) {
+} else if(type == 'Project Name:'){
+  let project = null;
+  app.dialog.prompt('Please enter a new project name:', 'New Project', function(name) {
     if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
-      element.firstElementChild.innerText = name;
-      app.dialog.alert('Item was changed to: ' + name, 'Item Updated!');
-    }
+    project = name;
+    app.dialog.prompt('Please enter a new client name:', 'New Client', function(name) {
+      if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
+      let projectobject = {projectname: project, clientname: name}
+      let newel = '<tr><td class="label-cell" data-collapsible-title=' + '"' + type + '"' + '>' + project + '</td><td class="label-cell" data-collapsible-title="Client Name:">' + name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement, ' + "'project'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement,' + "'project'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>'
+      element.children[1].children[0].children[0].children[0].children[1].children[0].children[0].children[1].innerHTML += newel;
+      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addproject', projectobject);
+      app.dialog.alert(project + ' & ' + name + ' was added! 😄', 'Item Added 🎉');
+      }
+    });
+  }
   });
-
-  dialog.$el.find('input').val(element.firstElementChild.innerText);
+}
 }
 
-function deleteItem(element){
+function editItem(element, type){
+  let newproj = null;
+  let newname = null;
+      
+      if(type == 'project'){
+        let dialog = app.dialog.prompt('', 'Enter a new ' + type + ' name:', function (name) {
+          if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
+            newproj = name;
+            let dialog = app.dialog.prompt('', 'Enter a new client name:', function (name) {
+              if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
+                  let projectobject = {projectname: newproj, clientname: name, oldproject: element.children[0].innerText, oldclient: element.children[1].innerText}
+                  // Update Front End
+                  element.children[0].innerText = newproj;
+                  element.children[1].innerText = name;
+                  // Send to Server
+                  app.request.postJSON('https://stormy-coast-58891.herokuapp.com/updateproject', projectobject);
+                  app.dialog.alert('Item was updated successfully. ', 'Item Updated!');
+              }
+            });
+            dialog.$el.find('input').val(element.children[1].innerText);
+          }
+        });
+        dialog.$el.find('input').val(element.children[0].innerText);
+      }
+      else if(type == 'category'){
+        let dialog = app.dialog.prompt('', 'Enter a new ' + type + ' name:', function (name) {
+          if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
+            newname = name;
+            if(type == 'category'){
+              let catobject = {oldcat: element.firstElementChild.innerText, newcat: newname}
+              // Update Front End
+              element.firstElementChild.innerText = name;
+              // Send to Server
+              app.request.postJSON('https://stormy-coast-58891.herokuapp.com/updatecategory', catobject);
+              app.dialog.alert('Item was updated successfully. ', 'Item Updated!');
+            }
+      }
+    });
+    dialog.$el.find('input').val(element.firstElementChild.innerText);
+  }
+}
+
+function deleteItem(element, type){
   app.dialog.confirm('Are you sure you want to delete this?', 'Confirm Deletion', function () {
+    if(type == 'project'){
+      // Send to Server
+      const data = {projectname: element.firstElementChild.innerText, clientname: element.children[1].innerText}
+      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deletecategory', data);
+    }
+    else if(type == 'category'){
+      // Send to Server
+      const data = {category: element.firstElementChild.innerText}
+      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deleteproject', data);
+    }
+    // Update Front End
     element.remove();
     app.dialog.alert('Item Deleted! 😄', 'Item Removed 🗑');
   });
+}
+
+function displayAdminTables(){
+  // Define tables
+  let category_table = document.getElementById("category_table");
+  let project_table = document.getElementById("project_table");
+
+  // Reset tables in duplicates are created
+  category_table.innerHTML = "";
+  project_table.innerHTML = "";
+
+  // Display table info
+  for(var i = 0; i < categorydata.length; i++){
+    category_table.innerHTML += '<table><tbody><tr><td class="label-cell" data-collapsible-title="Category Name:">' + categorydata[i].Categories  + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement, ' + "'category'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement, ' + "'category'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr></tbody></table>';
+  }
+
+  for(var i = 0; i < projectdata.length; i++){
+    project_table.innerHTML += '<tr><td class="label-cell" data-collapsible-title="Project Name:">' + projectdata[i].Project_Name + '</td><td class="label-cell" data-collapsible-title="Client Name:">' + projectdata[i].Client_Name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement, ' + "'project'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement, ' + "'project'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>';
+  }
 }

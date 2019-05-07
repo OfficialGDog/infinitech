@@ -223,10 +223,41 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
     res.end()
   })
 
+  router.post('/updatecategory', urlencodedParser, function(req, res) {
+    console.log("Trying to update an existing category...")
+    const queryString = "UPDATE category SET Categories = ? WHERE Categories = ?"
+  
+    getConnection().query(queryString, [req.body.oldcat, req.body.newcat], function (err, results, fields) {
+        if(err) {
+            console.log("Failed to update an exisiting category:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record(s) was updated!");
+        res.end()
+    })
+    res.end()
+  })
+
+  router.post('/deletecategory', urlencodedParser, function(req, res) {
+    console.log("Trying to delete an existing category...")
+    const queryString = "DELETE FROM category WHERE Categories = ?"
+  
+    getConnection().query(queryString, [req.body.category], function (err, results, fields) {
+        if(err) {
+            console.log("Failed to delete an exisiting category:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record(s) was deleted!");
+        res.end()
+    })
+    res.end()
+  })
+
+
   router.post('/addproject', urlencodedParser, function(req, res) {
     console.log("Trying to add a new project...")
-    var params = [req.body.projectid, req.body.projectname, req.body.clientname];
-    const queryString = "INSERT INTO project (Project_ID, Project_Name, Client_Name) VALUES (?,?,?)"
+    var params = [req.body.projectname, req.body.clientname];
+    const queryString = "INSERT INTO project (Project_Name, Client_Name) VALUES (?,?)"
   
     getConnection().query(queryString, params, function (err, results, fields) {
         if(err) {
@@ -234,6 +265,38 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
             return res.sendStatus(500)
         }
         console.log(results.affectedRows + " record(s) was added!");
+        res.end()
+    })
+    res.end()
+  })
+  
+  router.post('/updateproject', urlencodedParser, function(req, res) {
+    console.log("Trying to update a project and client name...")
+    var params = [req.body.projectname, req.body.clientname, req.body.oldproject, req.body.oldclient];
+    const queryString = "UPDATE project SET Project_Name = ?, Client_Name = ? WHERE Project_Name = ? AND Client_Name = ?"
+  
+    getConnection().query(queryString, params, function (err, results, fields) {
+        if(err) {
+            console.log("Failed to update project and client name:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record(s) was updated!");
+        res.end()
+    })
+    res.end()
+  })
+
+  router.post('/deleteproject', urlencodedParser, function(req, res) {
+    console.log("Trying to delete an exisiting project and client name...")
+    var params = [req.body.projectname, req.body.clientname];
+    const queryString = "DELETE FROM project WHERE Project_Name = ? AND Client_Name = ?"
+  
+    getConnection().query(queryString, params, function (err, results, fields) {
+        if(err) {
+            console.log("Failed to delete project and client name:" + err)
+            return res.sendStatus(500)
+        }
+        console.log(results.affectedRows + " record(s) was deleted!");
         res.end()
     })
     res.end()
