@@ -790,12 +790,12 @@ function deleteItem(element, type){
     if(type == 'project'){
       // Send to Server
       const data = {projectname: element.firstElementChild.innerText, clientname: element.children[1].innerText}
-      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deletecategory', data);
+      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deleteproject', data);
     }
     else if(type == 'category'){
       // Send to Server
       const data = {category: element.firstElementChild.innerText}
-      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deleteproject', data);
+      app.request.postJSON('https://stormy-coast-58891.herokuapp.com/deletecategory', data);
     }
     // Update Front End
     element.remove();
