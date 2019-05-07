@@ -1,7 +1,11 @@
-// load our app server using express somehow....
+// Init Variables
+var sslRedirect = require('heroku-ssl-redirect');
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+
+// enable ssl redirect
+app.use(sslRedirect());
 
 // Initialise Body Parser
 const bodyParser = require('body-parser')
