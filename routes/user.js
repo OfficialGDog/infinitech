@@ -227,7 +227,7 @@ router.post('/addexpense', urlencodedParser, function(req, res) {
     console.log("Trying to update an existing category...")
     const queryString = "UPDATE category SET Categories = ? WHERE Categories = ?"
   
-    getConnection().query(queryString, [req.body.oldcat, req.body.newcat], function (err, results, fields) {
+    getConnection().query(queryString, [req.body.newcat, req.body.oldcat], function (err, results, fields) {
         if(err) {
             console.log("Failed to update an exisiting category:" + err)
             return res.sendStatus(500)

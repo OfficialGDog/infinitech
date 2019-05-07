@@ -717,7 +717,7 @@ function newItem(element, type){
   if(type == 'Category Name:') {
   app.dialog.prompt('Please enter a new category:', 'New Category', function (name) {
     if(name == "") {app.dialog.alert("Field was blank. Invalid input!", "No input detected!")} else {
-      let newelement = '<tr><td class="label-cell" data-collapsible-title=' + '"' + type + '"' + '>' + name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement)" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>';
+      let newelement = '<tr><td class="label-cell" data-collapsible-title=' + '"' + type + '"' + '>' + name + '</td><td class="actions-cell" data-collapsible-title=""><a onclick="editItem(this.parentElement.parentElement, ' + "'category'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">compose</i></a><a onclick="deleteItem(this.parentElement.parentElement, ' + "'category'" + ')" class="link icon-only"><i class="icon f7-icons if-not-md">trash</i></a></td></tr>';
       element.childNodes[3].children[0].children[0].children[0].children[1].children[0].children[0].children[0].innerHTML += newelement;
       let catobject = {category: name}
       app.request.postJSON('https://stormy-coast-58891.herokuapp.com/addcategory', catobject);
