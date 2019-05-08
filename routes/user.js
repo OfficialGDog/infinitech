@@ -424,4 +424,9 @@ function getConnection(){
     return pool
 }
 
-module.exports = router
+// module.exports = router
+module.exports = {
+    router,
+    pool,
+    getConnection
+ }
